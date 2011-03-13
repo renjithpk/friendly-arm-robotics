@@ -22,13 +22,12 @@ public:
 
 	static I2CPort& Create(void); //this will act as a singleton object
 	
-	void write(uint8_t aData);
-	uint8_t read();
+	void setPort(uint8_t aData);
+	uint8_t readPort();
 	void setpin(bool state,uint8_t pinNumber);
 
-#ifdef DBG_ON
 	void display();
-#endif
+
 	~I2CPort();
 };
 

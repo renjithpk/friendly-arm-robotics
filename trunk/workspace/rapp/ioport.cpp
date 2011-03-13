@@ -28,19 +28,19 @@ I2CPort::I2CPort(uint8_t aAdd ){
 	}
 
 }
-void I2CPort::write(uint8_t aData){
+void I2CPort::setPort(uint8_t aData){
 	data = aData;
 	::write(fd, &data, 1);
 }
-uint8_t I2CPort::read(){
+uint8_t I2CPort::readPort(){
 	::read(fd, &data, 1);
 	return data;
 }
 void I2CPort::setpin(bool state,uint8_t pinNumber)
 {
-	read(); //data will update with latest port data
+	readPort(); //data will update with latest port data
 	data = state ? (data | 1 << pinNumber) : (data & ~(1 << pinNumber));
-	write(data);
+	setPort(data);
 }
 
 I2CPort::~I2CPort()
