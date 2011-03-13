@@ -9,9 +9,11 @@
 
 int main()
 {
-	motor * mptr = new wheel(2000);
+	DBG_PRINT("start APP");
+	motor * mptr = new wheel;
+	DBG_PRINT("set speed");
 	mptr->setSpeed(50);
+	DBG_PRINT("Run motor");
 	((wheel *)mptr)->run();
 
-	delete mptr;
 }

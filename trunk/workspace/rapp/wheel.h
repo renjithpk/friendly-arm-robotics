@@ -25,11 +25,11 @@ class wheel : public motor
 	uint16_t	timePeriod;
 	uint8_t 	dutyCycle; 	// in %
 	bool		isForward; // true forward / false reverse
-//	I2CPort		port;
+	I2CPort*	port;
 
 public:
 
-	wheel(uint16_t aPeriod = 1000);
+	wheel(uint16_t aPeriod = 999);
 	void run();
 	void setSpeed(uint8_t speed);
 	void setDirection(bool aIsforward);
