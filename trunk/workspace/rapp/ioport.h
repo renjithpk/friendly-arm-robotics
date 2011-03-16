@@ -13,13 +13,7 @@
 #include "types.h"
 #include <iostream>
 using namespace std;
-//#define DBG_ON
 
-#ifdef DBG_ON
-	#define DBG_PRINT(x) cout<<x<<endl
-#else
-	#define DBG_PRINT(x)
-#endif
 
 class I2CPort
 {

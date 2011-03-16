@@ -14,14 +14,13 @@ wheel::wheel(uint16_t aPeriod )
 	onTime = timePeriod;
 	offTime = 0;
 	port = I2CPort::Create();
-	cout<<port<<"\n";
 }
 
 void wheel::setSpeed(uint8_t aSpeed)
 {
+	if(0 == aSpeed || aSpeed > 100) return; //:TODO 0 => all off 100 => full speed should not be any -ve values
 	onTime = (timePeriod*aSpeed)/100;
 	offTime = timePeriod - onTime;
-	cout<<" on :"<<onTime<<" off "<<offTime<<"\n";
 }
 void wheel::setDirection(bool aIsForward)
 {
@@ -35,14 +34,15 @@ void wheel::run()
 
 	while(1){
 
+		turnOn();
 		tsR.tv_sec 	= 0;//onTime/1000; //onTime is in millisecond
 		tsR.tv_nsec = onTime * 1000000; //millisecond to nano second
 		nanosleep(&tsR,&tsE);
-		turnOn();
+		turnOff();
 		tsR.tv_sec 	= 0;// offTime/1000; //onTime is in millisecond
 		tsR.tv_nsec = offTime * 1000000; //millisecond to nano second
 		nanosleep(&tsR,&tsE);
-		turnOff();
+
 	}
 }
 

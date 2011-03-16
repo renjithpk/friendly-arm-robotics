@@ -36,7 +36,7 @@ I2CPort::I2CPort(uint8_t aAdd ){
 		throw 1;
 	}
 
-	cout<<" open device success "<<endl;
+	DBG_PRINT(" open device success ");
 
 	if( ioctl(fd, I2C_SLAVE, aAdd) < 0){
 		DBG_PRINT("error setting address");

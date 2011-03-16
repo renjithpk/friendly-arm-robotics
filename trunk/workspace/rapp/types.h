@@ -20,4 +20,12 @@ typedef unsigned short     uint16_t;
 typedef long long          int64_t;
 typedef unsigned long long uint64_t;
 
+//#define DBG_ON
+
+#ifdef DBG_ON
+	#define DBG_PRINT(x) cout<<x<<endl
+#else
+	#define DBG_PRINT(x)
+#endif
+
 #endif /* TYPES_H_ */
