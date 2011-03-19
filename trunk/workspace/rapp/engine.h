@@ -10,8 +10,10 @@
 #include "wheel.h"
 
 class engine {
-	//wheel*		pMotorL; // = new wheel(TIME_PERIOD);
+	wheel*		pMotorL; // = new wheel(TIME_PERIOD);
 	wheel*		pMotorR; // = new wheel(TIME_PERIOD);
+	uint16_t	speed;
+	bool		isForward;
 public:
 	engine();
 	virtual ~engine();

@@ -30,6 +30,36 @@ int main()
 	uint8_t speed = 0;
 
 	engine* pEngine = new engine();
+
+
+
+	speed =60;
+	cout<<"speed changed to " <<(int)speed<<"\n"<<endl;
+	pEngine->SetSpeed(speed);
+	pEngine->Start();
+#if 0
+	sleep(3);
+	pEngine->SetDirection(false);
+	sleep(3);
+	pEngine->SetDirection(true);
+	sleep(3);
+	pEngine->MoveLeft(50);
+	sleep(3);
+	pEngine->MoveLeft(150);
+	sleep(3);
+	pEngine->MoveLeft(200);
+	sleep(3);
+	pEngine->MoveRight(50);
+	sleep(3);
+	pEngine->MoveRight(150);
+	sleep(3);
+	pEngine->MoveRight(200);
+	sleep(3);
+	pEngine->SetSpeed(0);
+
+	return 0;
+#endif
+//
 	sleep(3);
 	speed =1;
 	cout<<"speed changed to " <<(int)speed<<"\n"<<endl;
