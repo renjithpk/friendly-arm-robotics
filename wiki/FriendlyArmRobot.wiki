@@ -1,11 +1,11 @@
-*This is a robotics project, platform Linux loaded in Arm9 2440c (FriendlyArm? development board). The application is written in C++.*
+=This is a robotics project, platform Linux loaded in Arm9 2440c (FriendlyArm? development board). The application is written in C++.=
 
-= Introduction =
+* Introduction *
 
 Add your content here.
 
 
-= Details =
+* Details *
 
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
