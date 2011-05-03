@@ -14,11 +14,11 @@ wheel::wheel(char aType, uint16_t aPeriod)
 	onTime 		= timePeriod;
 	offTime 	= 0;
 	port 		= I2CPort::Create();
-	if('R' == aType){
+	if('L' == aType){
 		pol1  = 0;
 		pol2  = 1;
 	}
-	else if('L' == aType){
+	else if('R' == aType){
 		pol1  = 2;
 		pol2  = 3;
 	}
@@ -26,7 +26,11 @@ wheel::wheel(char aType, uint16_t aPeriod)
 
 void wheel::setSpeed(uint8_t aSpeed)
 {
+
 	//if(0 == aSpeed || aSpeed > 100) return; //:TODO 0 => all off 100 => full speed should not be any -ve values
+
+	cout<<(int)aSpeed<<"speed\n";
+
 	if(0 == aSpeed){
 		onTime = 0;
 		offTime = timePeriod;

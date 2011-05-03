@@ -52,6 +52,10 @@ uint8_t I2CPort::readPort(){
 	::read(fd, &data, 1);
 	return data;
 }
+bool I2CPort::getPin(uint8_t pinNumber){
+	readPort();
+	return data& (1 << pinNumber);
+}
 void I2CPort::setpin(bool state,uint8_t pinNumber)
 {
 //	readPort(); //data will update with latest port data

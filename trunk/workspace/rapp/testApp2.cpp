@@ -8,6 +8,7 @@
 #include "engine.h"
 #include <unistd.h>
 #include <iostream>
+#include <stdio.h>
 using namespace std;
 
 
@@ -57,42 +58,128 @@ int main(){
 		DBG_PRINT("open device buttons");
 		throw;
 	}
-
+	pEngine->SetSpeed(0);
+	pEngine->Start();
 	while(1){
 		but = getButton(buttons_fd);
 		switch (but){
-		case 1:
+		case 1:{
+
+			I2CPort * port = I2CPort::Create();
+			timespec tsR,tsE;
+			uint8_t LIRCount = 0,RIRCount = 0,PIRCount = 0;
+
+
 			cout<<"pressed one"<<endl;
 			sleep(3);
-			speed =1;
-			cout<<"speed changed to " <<(int)speed<<"\n"<<endl;
-			pEngine->SetSpeed(speed);
-			pEngine->Start();
-			sleep(3);
-			speed =5;
-			cout<<"speed changed to " <<(int)speed<<"\n"<<endl;
-			pEngine->SetSpeed(speed);
-			sleep(3);
-			speed =20;
+			speed =99;
 			cout<<"speed changed to " <<(int)speed<<"\n"<<endl;
 			pEngine->SetSpeed(speed);
 
-			while(150 > speed){
-				sleep(3);
-				speed +=20;
-				cout<<"speed changed to " <<(int)speed<<"\n"<<endl;
-				pEngine->SetSpeed(speed);
+			tsR.tv_sec 	= 0;//onTime/1000; //onTime is in millisecond
+			tsR.tv_nsec = 10000000; //100 millisecond delay
+			while(1){
+				uint8_t data = 0;
+
+				nanosleep(&tsR,&tsE);
+				//sleep(1);
+				data = port->readPort();
+				//cout<<"port"<<(int)data<<"\n"<<endl;
+				//============================================================
+				//Left IR sensor
+				if( data & (1 << 4)){
+
+				//	cout<<"LIR triggered "<<endl;
+					//cout<<"LIR changed"<<endl;
+				//	if(LIRCount > 0){
+						//LIR is ON
+						cout<<"LIR is ON "<<endl;
+						pEngine->SetDirection(false);
+						pEngine->SetSpeed(20);
+						sleep(1);
+						pEngine->SetDirection(true);
+						pEngine->MoveRight(200);
+						sleep(1);
+						pEngine->SetDirection(true);
+						pEngine->SetSpeed(speed);
+						pEngine->SetSpeed(speed);
+				//	}
+				//	else{
+						//cout<<"LIRCount = "<<(int)LIRCount<<"\n";
+				//		LIRCount ++;
+				//	}
+
+				}
+				//else{
+					//cout<<"LIRCount cleared \n";
+				//	LIRCount = 0;
+				//}
+
+				//============================================================
+				//Right IR sensor
+				/*
+				 * if( data & (1 << 5)){
+					//cout<<"RIR changed"<<endl;
+					if(RIRCount > 3){
+						//LIR is ON
+						cout<<"RIR is ON "<<endl;
+						pEngine->SetDirection(false);
+						sleep(1);
+						pEngine->MoveLeft(200);
+						pEngine->SetDirection(true);
+						sleep(1);
+						pEngine->SetSpeed(speed);
+					}
+					else{
+						cout<<"RIRCount = "<<(int)RIRCount<<"\n";
+						RIRCount ++;
+					}
+
+				}
+				else{
+					//cout<<"RIRCount cleared \n";
+					RIRCount = 0;
+				}*/
+				//============================================================
+				// Passive infrared sensor
+				if( data & (1 << 6)){
+					//cout<<"PIR changed"<<endl;
+					if(PIRCount > 3){
+						//LIR is ON
+						cout<<"PIR is ON "<<endl;
+					}
+					else{
+						//cout<<"PIRCount = "<<(int)PIRCount<<"\n";
+						PIRCount ++;
+					}
+
+				}
+				else{
+					//cout<<"PIRCount cleared \n";
+					PIRCount = 0;
+				}
 
 			}
 			pEngine->SetSpeed(0);
 			break;
+		}
 		case 2:
 			cout<<"pressed two"<<endl;
 			speed =100;
+
 			cout<<"speed changed to " <<(int)speed<<"\n"<<endl;
-			pEngine->SetSpeed(speed);
+			pEngine->SetSpeed(99);
 			pEngine->SetDirection(true);
 			pEngine->Start();
+			while(1){
+				int temp;
+				cout<<"enter new angle"<<endl;
+				scanf("%d",&temp);
+				speed = (uint8_t)temp;
+				cout<<"angle = "<<(int)speed<<"\n";
+
+				pEngine->MoveRight(speed);
+			}
 			sleep(5);
 			pEngine->SetDirection(false);
 			sleep(5);
@@ -114,7 +201,6 @@ int main(){
 			pEngine->SetSpeed(speed);
 			sleep(10);
 			pEngine->SetSpeed(0);
-
 			break;
 		case 6:
 			pEngine->SetSpeed(0);
@@ -126,6 +212,7 @@ int main(){
 			delete pEngine;
 			return 0;
 			cout<<"Default"<<endl;
+
 
 		}
 	}

@@ -47,38 +47,92 @@ void engine::SetDirection(bool aIsForward){
 // range 0 - 200, speed will vary from 100 to 200 reverse direction
 void engine::MoveRight(uint8_t aAngle){
 	uint16_t newSpeed = 0;
-
 	if(aAngle > 200) return;
-
+	SetDirection(true);
 	if(aAngle > 100 ) {
-            pMotorR->setDirection(!isForward);
+		pMotorR->setDirection(false);
+		//printf("MLLL -RRR ");
+		aAngle -= 100;
+	}
+	else{
+		aAngle = 100 -	aAngle;
+	}
+	if(aAngle != 0){
+		newSpeed = (speed * aAngle)/100;
+
+		pMotorR->setSpeed(newSpeed);
+		pMotorL->setSpeed(speed);
+		//printf(" ML = %d MR = %d\n",(int)newSpeed,(int)speed);
+	}
+	else{
+		//new
+		pMotorR->setSpeed(0);
+		//printf(" ML = %d MR = %d ---a=0\n",0,(int)speed);
+
+	}
+	/*	if(aAngle > 200) return;
+	SetDirection(true);
+	if(aAngle > 100 ) {
+            pMotorR->setDirection(false);
             aAngle -= 100;
     }
-    aAngle -= 100;
 
     if(aAngle != 0){
-    	 newSpeed = (speed * aAngle)/100;
+    	newSpeed = (speed * aAngle)/100;
+		pMotorL->setSpeed(newSpeed);
+		pMotorR->setSpeed(speed);
+		cout<<" ML = "<<(int)newSpeed<<" MR = "<<(int)speed<<"\n";
     }
-
-    pMotorL->setSpeed(newSpeed);
-    pMotorR->setSpeed(speed);
+    else{
+    	SetSpeed(speed);
+    }
+    */
 }
 
 void engine::MoveLeft(uint8_t aAngle){
 	uint16_t newSpeed = 0;
 
 	if(aAngle > 200) return;
+	SetDirection(true);
+	if(aAngle > 100 ) {
+		pMotorL->setDirection(false);
+		//printf("MLLL -RRR ");
+		aAngle -= 100;
+	}
+	else{
+		aAngle = 100 -	aAngle;
+	}
+	if(aAngle != 0){
+		newSpeed = (speed * aAngle)/100;
+
+		pMotorL->setSpeed(newSpeed);
+		pMotorR->setSpeed(speed);
+		//printf(" ML = %d MR = %d\n",(int)newSpeed,(int)speed);
+	}
+	else{
+		//new
+		pMotorL->setSpeed(0);
+		//printf(" ML = %d MR = %d ---a=0\n",0,(int)speed);
+
+	}
+
+
+	/*	SetDirection(true);
+	if(aAngle > 200) return;
 
 	if(aAngle > 100 ) {
-            pMotorL->setDirection(!isForward);
+            pMotorL->setDirection(false);
             aAngle -= 100;
     }
-    aAngle = 100 - aAngle;
 
     if(aAngle != 0){
-    	 newSpeed = (speed * aAngle)/100;
-    }
+		newSpeed = (speed * aAngle)/100;
 
-    pMotorR->setSpeed(newSpeed);
-    pMotorL->setSpeed(speed);
+		pMotorR->setSpeed(newSpeed);
+		pMotorL->setSpeed(speed);
+		cout<<" ML = "<<(int)speed<<" MR = "<<(int)newSpeed<<"\n";
+    }
+    else{
+    	SetSpeed(speed);
+    }*/
 }

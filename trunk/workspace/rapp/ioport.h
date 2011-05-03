@@ -33,6 +33,7 @@ public:
 	void setPort(uint8_t aData);
 	uint8_t readPort();
 	void setpin(bool state,uint8_t pinNumber);
+	bool getPin(uint8_t pinNumber);
 
 	void display();
 
