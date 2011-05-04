@@ -2,12 +2,11 @@ Robotic project, running in Linux platform using mini2440 Dev board
 
 = Introduction =
 
-This is a robotics project, platform Linux loaded in Arm9 2440c (FriendlyArm? development board). The application is written in C++.
+This is a robotics project, platform Linux loaded in Arm9 2440c (FriendlyArm development board). The application is written in C++.
 
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+*Current Status*
+*Sensors and actuators*
+*Programing environment*
