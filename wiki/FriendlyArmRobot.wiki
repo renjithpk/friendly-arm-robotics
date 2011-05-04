@@ -7,7 +7,7 @@ This is a robotics project, platform Linux loaded in Arm9 2440c (FriendlyArm dev
 
 = Details =
 
-*Current Status*
+*[Current Status]*
 
 *Sensors and actuators*
 
