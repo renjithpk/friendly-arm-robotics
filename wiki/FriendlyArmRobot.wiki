@@ -16,6 +16,7 @@ This is a robotics project, platform Linux loaded in Arm9 2440c (FriendlyArm dev
 *Files
 
 *Current Status
+
 Recently I finished the first level of my project, it can just move around by its own, no control over it, if it find some obstacle it will go back a little and takes a turn. To find obstacle it has IR sensor. 
 
  
