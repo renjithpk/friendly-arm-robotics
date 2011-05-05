@@ -50,7 +50,7 @@ int main(){
 	int buttons_fd;
 	char but;
 	uint8_t speed = 0;
-	engine* pEngine = new engine();
+	Engine* pEngine = new Engine();
 
 	buttons_fd = open("/dev/buttons", 0);
 

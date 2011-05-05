@@ -9,14 +9,14 @@
 #define ENGINE_H_
 #include "wheel.h"
 
-class engine {
+class Engine {
 	wheel*		pMotorL; // = new wheel(TIME_PERIOD);
 	wheel*		pMotorR; // = new wheel(TIME_PERIOD);
 	uint16_t	speed;
 	bool		isForward;
 public:
-	engine();
-	virtual ~engine();
+	Engine();
+	virtual ~Engine();
 	//set speed for both right and left wheel, and speed will be same
 	void SetSpeed(uint8_t aSpeed);
 	//true is forward and false is reverse

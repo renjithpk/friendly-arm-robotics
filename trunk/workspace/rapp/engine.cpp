@@ -7,7 +7,7 @@
 #include "types.h"
 #include "engine.h"
 
-engine::engine() {
+Engine::Engine() {
 	// TODO Auto-generated constructor stub
 	pMotorR = new wheel('R');
 	pMotorL = new wheel('L');
@@ -16,20 +16,20 @@ engine::engine() {
 
 }
 
-engine::~engine() {
+Engine::~Engine() {
 	// TODO Auto-generated destructor stub
 	delete pMotorL;
 	delete pMotorR;
 }
 
 
-void engine::Start(){
+void Engine::Start(){
 	pMotorL->Start(NULL);
 	pMotorR->Start(NULL);
 }
 
 
-void engine::SetSpeed(uint8_t aSpeed){
+void Engine::SetSpeed(uint8_t aSpeed){
 	speed = aSpeed;
 	pMotorL->setSpeed(aSpeed);
 	pMotorR->setSpeed(aSpeed);
@@ -38,14 +38,14 @@ void engine::SetSpeed(uint8_t aSpeed){
 
 
 //true is forward and false is reverse
-void engine::SetDirection(bool aIsForward){
+void Engine::SetDirection(bool aIsForward){
 	isForward = aIsForward;
 	pMotorL->setDirection(aIsForward);
 	pMotorR->setDirection(aIsForward);
 }
 
 // range 0 - 200, speed will vary from 100 to 200 reverse direction
-void engine::MoveRight(uint8_t aAngle){
+void Engine::MoveRight(uint8_t aAngle){
 	uint16_t newSpeed = 0;
 	if(aAngle > 200) return;
 	SetDirection(true);
@@ -89,7 +89,7 @@ void engine::MoveRight(uint8_t aAngle){
     */
 }
 
-void engine::MoveLeft(uint8_t aAngle){
+void Engine::MoveLeft(uint8_t aAngle){
 	uint16_t newSpeed = 0;
 
 	if(aAngle > 200) return;
