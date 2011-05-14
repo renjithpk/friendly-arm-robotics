@@ -14,6 +14,7 @@
 class RoboApp: public Event {
 	Engine* engine;
 	int 	speed;
+	bool	isBlocked;
 public:
 	RoboApp();
 	virtual ~RoboApp();
