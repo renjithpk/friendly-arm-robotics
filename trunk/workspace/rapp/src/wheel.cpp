@@ -8,20 +8,23 @@
 #include "wheel.h"
 wheel::wheel(char aType, uint16_t aPeriod)
 {
-	DBG_PRINT("wheelConstructor");
+	PRINT_1("wheelConstructor");
 	timePeriod 	= aPeriod; //1 second;
 	isForward 	= true;
 	onTime 		= timePeriod;
 	offTime 	= 0;
 	port 		= I2CPort::Create();
-	if('L' == aType){
+	if('L' == aType)
+	{
 		pol1  = 0;
 		pol2  = 1;
 	}
-	else if('R' == aType){
+	else if('R' == aType)
+	{
 		pol1  = 2;
 		pol2  = 3;
 	}
+	type = aType;
 }
 
 void wheel::setSpeed(uint8_t aSpeed)
@@ -29,13 +32,15 @@ void wheel::setSpeed(uint8_t aSpeed)
 
 	//if(0 == aSpeed || aSpeed > 100) return; //:TODO 0 => all off 100 => full speed should not be any -ve values
 
-	cout<<(int)aSpeed<<"speed\n";
+	PRINT_1("set speed %d %c",aSpeed,type);
 
-	if(0 == aSpeed){
+	if(0 == aSpeed)
+	{
 		onTime = 0;
 		offTime = timePeriod;
 	}
-	else if(100 <= aSpeed){
+	else if(100 <= aSpeed)
+	{
 		onTime = timePeriod;
 		offTime = 0;
 	}
@@ -47,19 +52,23 @@ void wheel::setDirection(bool aIsForward)
 	isForward = aIsForward;
 }
 
-void wheel::Execute(void*){
+void wheel::Execute(void*)
+{
 	timespec tsR,tsE;
-	DBG_PRINT("run motor");
+	PRINT_1("run motor");
 
-	while(1){
+	while(1)
+	{
 
-		if(0 != onTime){
+		if(0 != onTime)
+		{
 			turnOn();
 			tsR.tv_sec 	= 0;//onTime/1000; //onTime is in millisecond
 			tsR.tv_nsec = onTime * 1000; //microsecond to nano second
 			nanosleep(&tsR,&tsE);
 		}
-		if(0 != offTime){
+		if(0 != offTime)
+		{
 			turnOff();
 			tsR.tv_sec 	= 0;// offTime/1000; //onTime is in millisecond
 			tsR.tv_nsec = offTime * 1000; //microsecond to nano second
@@ -73,7 +82,7 @@ void wheel::Execute(void*){
 /*void wheel::run()
 {
 	timespec tsR,tsE;
-	DBG_PRINT("run motor");
+	PRINT_1("run motor");
 
 	while(1){
 
@@ -93,7 +102,7 @@ inline void wheel::turnOn()
 {
 /*
 	if(isForward){
-		DBG_PRINT("forward  ON ");
+		PRINT_1("forward  ON ");
 		port->setpin(1,pol1);
 		port->setpin(0,pol2);
 	}
@@ -110,7 +119,7 @@ inline void wheel::turnOn()
 inline void wheel::turnOff()
 {
 
-	DBG_PRINT("forward  OFF ");
+	PRINT_2("forward  OFF ");
 	isForward ? port->setpin(0,pol1): port->setpin(0,pol2);
 
 }

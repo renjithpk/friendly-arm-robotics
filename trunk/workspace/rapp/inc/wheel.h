@@ -31,11 +31,11 @@ class wheel :  public Thread
 	I2CPort*	port;
 	uint8_t		pol1;
 	uint8_t		pol2;
-
+	char        type;
 	virtual void Execute(void*);
 public:
 
-	wheel(char aType, uint16_t aPeriod = 35535);
+	wheel(char aType, uint16_t aPeriod = 45535);
 	//void run();
 	void setSpeed(uint8_t speed);
 	void setDirection(bool aIsforward);

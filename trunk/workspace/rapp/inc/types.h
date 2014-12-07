@@ -7,7 +7,7 @@
 
 #ifndef TYPES_H_
 #define TYPES_H_
-
+#include <stdio.h>
 typedef signed char        int8_t;
 typedef unsigned char      uint8_t;
 
@@ -20,12 +20,27 @@ typedef unsigned short     uint16_t;
 typedef long long          int64_t;
 typedef unsigned long long uint64_t;
 
-//#define DBG_ON
+#define INFO_ON
+//#define DEBUG_ON
+//#define WARNING_ON
+#define ERROR_ON
 
-#ifdef DBG_ON
-	#define DBG_PRINT(x) cout<<x<<endl
+#ifdef INFO_ON
+	#define PRINT_1(...) printf(__VA_ARGS__);printf("\n")
 #else
-	#define DBG_PRINT(x)
+	#define PRINT_1(x)
 #endif
 
+#ifdef DEBUG_ON
+	#define PRINT_2(...) printf( __VA_ARGS__);printf("\n")
+#else
+	#define PRINT_2(x)
+#endif
+
+#ifdef WARNING_ON
+	#define PRINT_3(...) printf(__VA_ARGS__);printf("\n")
+#else
+	#define PRINT_3(x)
+#endif
+#define PRINT_4(...) printf(__VA_ARGS__);printf("\n")
 #endif /* TYPES_H_ */
