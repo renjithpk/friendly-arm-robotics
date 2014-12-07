@@ -25,6 +25,8 @@ public:
 	void MoveRight(uint8_t aAngle);
 	void MoveLeft(uint8_t aAngle);
 	void Start();
+	void SpeedUp();
+	void SpeedDown();
 };
 
 #endif /* ENGINE_H_ */

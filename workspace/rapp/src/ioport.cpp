@@ -15,7 +15,7 @@ I2CPort * I2CPort::Create(){
 	I2CPort::count ++;
 	if(NULL == I2CPort::myPtr){
 		I2CPort::myPtr = new I2CPort;
-		DBG_PRINT("created");
+		PRINT_1("created");
 	}
 	return I2CPort::myPtr;
 }
@@ -23,23 +23,23 @@ void I2CPort::Release()
 {
 	I2CPort::count--;
 	if(0 == I2CPort::count){
-		DBG_PRINT("I2CPort released");
+		PRINT_1("I2CPort released");
 		delete I2CPort::myPtr;
 		I2CPort::myPtr = NULL;
 	}
 }
 I2CPort::I2CPort(uint8_t aAdd ){
-	fd = open("/dev/i2c/0",O_RDWR);
+	fd = open("/dev/i2c-0",O_RDWR);
 
 	if(fd < 0){
-		DBG_PRINT("error opening device ");
+		PRINT_4("error opening device ");
 		throw 1;
 	}
 
-	DBG_PRINT(" open device success ");
+	PRINT_1(" open device success ");
 
 	if( ioctl(fd, I2C_SLAVE, aAdd) < 0){
-		DBG_PRINT("error setting address");
+		PRINT_4("error setting address");
 		throw 1;
 	}
 
@@ -65,7 +65,7 @@ void I2CPort::setpin(bool state,uint8_t pinNumber)
 
 I2CPort::~I2CPort()
 {
-	DBG_PRINT("port destructor ");
+	PRINT_1("port destructor ");
 	::close(fd);
 }
 
