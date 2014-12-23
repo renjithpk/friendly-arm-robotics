@@ -32,7 +32,6 @@ void wheel::setSpeed(uint8_t aSpeed)
 
 	//if(0 == aSpeed || aSpeed > 100) return; //:TODO 0 => all off 100 => full speed should not be any -ve values
 
-	PRINT_1("set speed %d %c",aSpeed,type);
 
 	if(0 == aSpeed)
 	{
@@ -46,6 +45,8 @@ void wheel::setSpeed(uint8_t aSpeed)
 	}
 	onTime = (timePeriod*aSpeed)/100;
 	offTime = timePeriod - onTime;
+	
+	PRINT_1("set speed %d %c ON %d OFF %d",aSpeed,type,onTime,offTime);
 }
 void wheel::setDirection(bool aIsForward)
 {
@@ -63,6 +64,7 @@ void wheel::Execute(void*)
 		if(0 != onTime)
 		{
 			turnOn();
+			PRINT_2("on %c",type);
 			tsR.tv_sec 	= 0;//onTime/1000; //onTime is in millisecond
 			tsR.tv_nsec = onTime * 1000; //microsecond to nano second
 			nanosleep(&tsR,&tsE);
@@ -70,6 +72,7 @@ void wheel::Execute(void*)
 		if(0 != offTime)
 		{
 			turnOff();
+			PRINT_2("off %c",type);
 			tsR.tv_sec 	= 0;// offTime/1000; //onTime is in millisecond
 			tsR.tv_nsec = offTime * 1000; //microsecond to nano second
 			nanosleep(&tsR,&tsE);
@@ -79,47 +82,42 @@ void wheel::Execute(void*)
 
 }
 
-/*void wheel::run()
-{
-	timespec tsR,tsE;
-	PRINT_1("run motor");
-
-	while(1){
-
-		turnOn();
-		tsR.tv_sec 	= 0;//onTime/1000; //onTime is in millisecond
-		tsR.tv_nsec = onTime * 1000; //microsecond to nano second
-		nanosleep(&tsR,&tsE);
-		turnOff();
-		tsR.tv_sec 	= 0;// offTime/1000; //onTime is in millisecond
-		tsR.tv_nsec = offTime * 1000; //microsecond to nano second
-		nanosleep(&tsR,&tsE);
-
-	}
-}*/
 
 inline void wheel::turnOn()
 {
-/*
-	if(isForward){
-		PRINT_1("forward  ON ");
-		port->setpin(1,pol1);
-		port->setpin(0,pol2);
-	}
-	else{
-		port->setpin(0,pol1);
-		port->setpin(1,pol2);
-	}
-	*/
-	port->setpin(isForward,pol1); //to optimize the above code
-	port->setpin(!isForward,pol2);
+	//port->setpin(isForward,pol1); //to optimize the above code
+	//port->setpin(!isForward,pol2);
+	//data = state ? (data | 1 << pinNumber) : (data & ~(1 << pinNumber));
+	//	setPort(data);
 
+	uint8_t data = port->readPort();
+	if(isForward)
+	{
+		data = data | 1 << pol1;
+		data =  data & ~(1 << pol2); 
+	}
+	else
+	{
+		data = data | 1 << pol2;
+		data =  data & ~(1 << pol1); 
+	}
+	port->setPort(data);
 }
 
 inline void wheel::turnOff()
 {
 
-	PRINT_2("forward  OFF ");
-	isForward ? port->setpin(0,pol1): port->setpin(0,pol2);
-
+	//isForward ? port->setpin(0,pol1): port->setpin(0,pol2);
+	uint8_t data = port->readPort();
+	if(isForward)
+	{
+		//data = data | 1 << pol1;
+		data =  data & ~(1 << pol1); 
+	}
+	else
+	{
+		//data = data | 1 << pol2;
+		data =  data & ~(1 << pol2); 
+	}
+	port->setPort(data);
 }

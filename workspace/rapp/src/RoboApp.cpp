@@ -36,15 +36,16 @@ int RoboApp::Initialize(void)
 bool RoboApp::EventCallBack(ESensor aType, bool state)
 {
 	//cout << int(aType)<<" state " << (int)state<<" \n ";
+	PRINT_1("EventCallBack [%d]", state);
 	if( aType == ESensor_IR && state == true  ){
-		cout<<"LIR is ON "<<endl;
+		
 		engine->SetDirection(false);
-		engine->SetSpeed(20);
+		engine->SetSpeed(70);
 	}
 	else if( aType == ESensor_IR && state == false  ){
 		sleep(1);
 		engine->SetDirection(true);
-		engine->MoveRight(200);
+		engine->MoveRight(100);
 		sleep(1);
 		engine->SetDirection(true);
 		engine->SetSpeed(100);

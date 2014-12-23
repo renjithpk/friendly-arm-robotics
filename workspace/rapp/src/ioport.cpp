@@ -10,6 +10,7 @@ using namespace std;
 
 I2CPort * I2CPort::myPtr = NULL;
 uint8_t I2CPort::count = 0;
+pthread_mutex_t I2C_mtx;
 
 I2CPort * I2CPort::Create(){
 	I2CPort::count ++;
@@ -46,10 +47,16 @@ I2CPort::I2CPort(uint8_t aAdd ){
 }
 void I2CPort::setPort(uint8_t aData){
 	data = aData;
+	//mutex start
+	pthread_mutex_lock(&I2C_mtx);
 	::write(fd, &data, 1);
+	pthread_mutex_unlock(&I2C_mtx);
+	//mutex end
 }
 uint8_t I2CPort::readPort(){
+	pthread_mutex_lock(&I2C_mtx);
 	::read(fd, &data, 1);
+	pthread_mutex_unlock(&I2C_mtx);
 	return data;
 }
 bool I2CPort::getPin(uint8_t pinNumber){
@@ -61,6 +68,7 @@ void I2CPort::setpin(bool state,uint8_t pinNumber)
 //	readPort(); //data will update with latest port data
 	data = state ? (data | 1 << pinNumber) : (data & ~(1 << pinNumber));
 	setPort(data);
+	PRINT_2("i2c data %x",data);
 }
 
 I2CPort::~I2CPort()
