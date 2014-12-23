@@ -28,19 +28,19 @@ typedef unsigned long long uint64_t;
 #ifdef INFO_ON
 	#define PRINT_1(...) printf(__VA_ARGS__);printf("\n")
 #else
-	#define PRINT_1(x)
+	#define PRINT_1(...)
 #endif
 
 #ifdef DEBUG_ON
 	#define PRINT_2(...) printf( __VA_ARGS__);printf("\n")
 #else
-	#define PRINT_2(x)
+	#define PRINT_2(...)
 #endif
 
 #ifdef WARNING_ON
 	#define PRINT_3(...) printf(__VA_ARGS__);printf("\n")
 #else
-	#define PRINT_3(x)
+	#define PRINT_3(...)
 #endif
 #define PRINT_4(...) printf(__VA_ARGS__);printf("\n")
 #endif /* TYPES_H_ */

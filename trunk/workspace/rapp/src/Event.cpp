@@ -24,6 +24,7 @@ int Event::RunApp(void)
 	while(1){
 
 		uint8_t cData = port->readPort();
+		//trigger call back if current and previous data are different 
 		if( (cData & ( 1 << ESensor_IR )) ^ (data & ( 1 << ESensor_IR )) ){
 			cout<<"event triggered"<<endl;
 			this->EventCallBack( ESensor_IR ,cData & ( 1 << ESensor_IR ) );
