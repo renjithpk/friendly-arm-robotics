@@ -24,6 +24,7 @@ public:
 	int RunApp(void);
 	virtual ~Event();
 	virtual bool EventCallBack(ESensor aType, bool state);
+	//virtual bool FaceDetected(ESensor aType, bool state);
 };
 
 #endif /* SENSOREVENT_H_ */
