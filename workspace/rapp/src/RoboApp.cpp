@@ -4,8 +4,9 @@
  *  Created on: 03-May-2011
  *      Author: renjith
  */
-
+#include "personDetect.h"
 #include "RoboApp.h"
+
 
 int main()
 {
@@ -27,11 +28,17 @@ RoboApp::~RoboApp() {
 
 int RoboApp::Initialize(void)
 {
+	PerDetect pd;
+	pd.initialize();
 	engine = new Engine();
-	engine->SetSpeed(speed);
+	engine->SetSpeed(0);
 	engine->Start();
+	engine->SetSpeed(0);
 	return RunApp();
+
 }
+
+
 //Ir sensor ESensor_IR, state - true/false true => blocked
 bool RoboApp::EventCallBack(ESensor aType, bool state)
 {
@@ -52,11 +59,5 @@ bool RoboApp::EventCallBack(ESensor aType, bool state)
 	}
 
 }
-
-
-
-
-
-
 
 
