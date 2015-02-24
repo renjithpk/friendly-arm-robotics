@@ -8,7 +8,7 @@
 #include "wheel.h"
 wheel::wheel(char aType, uint16_t aPeriod)
 {
-	PRINT_1("wheelConstructor");
+	syslog(LOG_INFO,"wheelConstructor");
 	timePeriod 	= aPeriod; //1 second;
 	isForward 	= true;
 	onTime 		= timePeriod;
@@ -46,7 +46,7 @@ void wheel::setSpeed(uint8_t aSpeed)
 	onTime = (timePeriod*aSpeed)/100;
 	offTime = timePeriod - onTime;
 	
-	PRINT_1("set speed %d %c ON %d OFF %d",aSpeed,type,onTime,offTime);
+	//syslog(LOG_INFO,"set speed %d %c ON %d OFF %d",aSpeed,type,onTime,offTime);
 }
 void wheel::setDirection(bool aIsForward)
 {
@@ -56,7 +56,7 @@ void wheel::setDirection(bool aIsForward)
 void wheel::Execute(void*)
 {
 	timespec tsR,tsE;
-	PRINT_1("run motor");
+	syslog(LOG_INFO,"run motor");
 
 	while(1)
 	{
@@ -64,7 +64,7 @@ void wheel::Execute(void*)
 		if(0 != onTime)
 		{
 			turnOn();
-			PRINT_2("on %c",type);
+			//syslog(LOG_DEBUG,"on %c",type);
 			tsR.tv_sec 	= 0;//onTime/1000; //onTime is in millisecond
 			tsR.tv_nsec = onTime * 1000; //microsecond to nano second
 			nanosleep(&tsR,&tsE);
@@ -72,7 +72,7 @@ void wheel::Execute(void*)
 		if(0 != offTime)
 		{
 			turnOff();
-			PRINT_2("off %c",type);
+			//syslog(LOG_DEBUG,"off %c",type);
 			tsR.tv_sec 	= 0;// offTime/1000; //onTime is in millisecond
 			tsR.tv_nsec = offTime * 1000; //microsecond to nano second
 			nanosleep(&tsR,&tsE);
