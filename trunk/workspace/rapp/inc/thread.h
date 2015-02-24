@@ -1,5 +1,5 @@
 /*
- * Thread.h
+ * thread.h
  *
  *  Created on: Mar 17, 2011
  *      Author: renjith
@@ -8,8 +8,12 @@
 #ifndef THREAD_H_
 #define THREAD_H_
 #include <pthread.h>
+//Derive the object from Thread,
+//overrride Execute
+//Execute Start
 
-class Thread {
+class Thread
+{
 	pthread_t	thread;
     void *		arg;
 public:

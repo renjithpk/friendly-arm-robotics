@@ -1,11 +1,11 @@
 /*
- * Thread.cpp
+ * thread.cpp
  *
  *  Created on: Mar 17, 2011
  *      Author: renjith
  */
 
-#include "Thread.h"
+#include "thread.h"
 
 Thread::Thread() {
 	// TODO Auto-generated constructor stub

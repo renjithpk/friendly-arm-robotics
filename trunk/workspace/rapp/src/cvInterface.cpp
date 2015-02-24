@@ -1,4 +1,8 @@
 #include "cvInterface.h"
+#include <iostream>
+
+using namespace std;
+
 
 int cvIf::displayImgage(Mat &img)
 {

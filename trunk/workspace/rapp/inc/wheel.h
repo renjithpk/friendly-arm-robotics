@@ -5,20 +5,14 @@
  *      Author: renjith
  */
 
-#include <time.h>
-#include "ioport.h"
-#include "Thread.h"
 #ifndef WHEEL_H_
 #define WHEEL_H_
 
 
-/*class motor
-{
-public:
-	virtual void setSpeed(uint8_t speed) = 0;
-	virtual void setDirection(bool aIsforward) = 0;
-	virtual
-};*/
+#include <time.h>
+#include "ioport.h"
+#include "thread.h"
+
 
 class wheel :  public Thread
 {

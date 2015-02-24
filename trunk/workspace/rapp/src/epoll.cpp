@@ -3,27 +3,29 @@
 
 #include "epoll.h"
 #include <syslog.h>
+#include <cstddef>
 
 
-using namespace std;
 Epoll * Epoll::my_ptr = NULL;
 
 /******     EpollIF *********/
 
 EpollIf::EpollIf(const int &fd ):fd_m(fd)
 {
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	ev.events = EPOLLIN | EPOLLPRI | EPOLLERR | EPOLLHUP;
 	ev.data.fd = fd;
 }
 
 EpollIf::EpollIf()
 {
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	fd_m = -1;
 }
 
 void EpollIf::initialize(const int &fd )
 {
-	syslog(LOG_INFO,"EpollIf::initialize()");
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	ev.events = EPOLLIN | EPOLLPRI | EPOLLERR | EPOLLHUP;
 	ev.data.fd = fd;
 	fd_m = fd;
@@ -36,6 +38,7 @@ void EpollIf::initialize(const int &fd )
 
 Epoll * Epoll::getInstance()
 {
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	if(my_ptr == NULL)
 	{
 		my_ptr = new Epoll;
@@ -51,6 +54,7 @@ Epoll::Epoll()
 
 int Epoll::addFd(EpollIf *intEpoll)
 {
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	intList[intEpoll->fd_m] = intEpoll;
 	int res = epoll_ctl(epfd, EPOLL_CTL_ADD,intEpoll->fd_m , &intEpoll->ev);
 	syslog(LOG_INFO,"epoll fd added res %d epfd %d",res,epfd);
@@ -58,7 +62,7 @@ int Epoll::addFd(EpollIf *intEpoll)
 
 int Epoll::run()
 {
-	syslog(LOG_INFO,"Epoll::run() epoll wait loop");
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	while(1)
 	{
 		syslog(LOG_DEBUG,"Epoll::run() before epollwait");
@@ -79,7 +83,7 @@ int Epoll::run()
 				//::close (events[i].data.fd);
 				continue;
 			}
-			
+
 			int tempfd = events[i].data.fd;
 			if( intList.end() != intList.find(tempfd))
 			{
