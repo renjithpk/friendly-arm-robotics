@@ -20,13 +20,14 @@ int Event::RunApp(void)
 	timespec tsR,tsE;
 	tsR.tv_sec 	= 0;//onTime/1000; //onTime is in millisecond
 	tsR.tv_nsec = 10000000; //100 millisecond delay
-	cout<<"inside Run App"<<endl;
-	while(1){
+	syslog(LOG_INFO,"inside Run App");
+	while(1)
+	{
 
 		uint8_t cData = port->readPort();
 		//trigger call back if current and previous data are different 
 		if( (cData & ( 1 << ESensor_IR )) ^ (data & ( 1 << ESensor_IR )) ){
-			cout<<"event triggered"<<endl;
+			syslog(LOG_DEBUG,"event triggered");
 			this->EventCallBack( ESensor_IR ,cData & ( 1 << ESensor_IR ) );
 
 		}

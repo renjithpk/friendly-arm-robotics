@@ -14,6 +14,8 @@ using namespace std;
 #include <termios.h>
 #include <stdio.h>
 
+class Terminal
+{
 static struct termios old_termios, new_termios;
 
 /* Initialize new terminal i/o settings */
@@ -53,7 +55,7 @@ char getche(void)
 {
 	return getch_(1);
 }
-
+};
 void autoMode(Engine* pEngine)
 {
 	uint8_t speed = 100;

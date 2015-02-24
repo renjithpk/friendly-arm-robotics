@@ -7,7 +7,8 @@
 #include "types.h"
 #include "engine.h"
 
-Engine::Engine() {
+Engine::Engine()
+{
 	// TODO Auto-generated constructor stub
 	pMotorR = new wheel('R');
 	pMotorL = new wheel('L');
@@ -16,14 +17,16 @@ Engine::Engine() {
 
 }
 
-Engine::~Engine() {
+Engine::~Engine()
+{
 	// TODO Auto-generated destructor stub
 	delete pMotorL;
 	delete pMotorR;
 }
 
 
-void Engine::Start(){
+void Engine::Start()
+{
 	pMotorL->Start(NULL);
 	pMotorR->Start(NULL);
 }
@@ -33,12 +36,12 @@ void Engine::SetSpeed(uint8_t aSpeed)
 {
 	if(aSpeed >100 )
 	{
-		PRINT_4("speed out of range [%d]",aSpeed);
+		syslog(LOG_ERR,"speed out of range [%d]",aSpeed);
 		speed = 100;
 	}
 	else if( aSpeed <0)
 	{
-		PRINT_4("speed out of range [%d]",aSpeed);
+		syslog(LOG_ERR,"speed out of range [%d]",aSpeed);
 	speed = 0;
 	}
 	else
@@ -54,20 +57,20 @@ void Engine::SpeedUp()
 {
 	if(isForward == true)
 	{
-		PRINT_1("increase forward speed");
+		syslog(LOG_INFO,"increase forward speed");
 		SetSpeed(speed +10);
 	}
 	else
 	{
 		if((speed - 10) < 0)
 		{
-			PRINT_1("change to forward");
+			syslog(LOG_INFO,"change to forward");
 		    SetDirection(true);
 			SetSpeed(10 - speed);
 		}
 		else 
 		{
-			PRINT_1("Decrease reverse speed");
+			syslog(LOG_INFO,"Decrease reverse speed");
 			SetSpeed(speed - 10);
 		}
 	}
@@ -77,20 +80,20 @@ void Engine::SpeedDown()
 {
 	if(isForward == false)
 	{
-		PRINT_1("increase reverse speed");
+		syslog(LOG_INFO,"increase reverse speed");
 		SetSpeed(speed +10);
 	}
 	else
 	{
 		if((speed - 10) < 0)
 		{
-			PRINT_1("change to reverse");
+			syslog(LOG_INFO,"change to reverse");
 		    SetDirection(false);
 			SetSpeed(10 - speed);
 		}
 		else 
 		{
-			PRINT_1("decrease forward speed");
+			syslog(LOG_INFO,"decrease forward speed");
 			SetSpeed(speed -10);
 		}
 	}
@@ -136,12 +139,12 @@ void Engine::MoveRight(uint8_t aAngle)
 }
 
 void Engine::MoveLeft(uint8_t aAngle)
-    {
+{
 	uint16_t newSpeed = 0;
 
 	if(aAngle > 200)
 	{
-		PRINT_4("invalid range [%d]",aAngle);
+		syslog(LOG_ERR,"invalid range [%d]",aAngle);
 		return;
 	}
 

@@ -16,7 +16,7 @@ I2CPort * I2CPort::Create(){
 	I2CPort::count ++;
 	if(NULL == I2CPort::myPtr){
 		I2CPort::myPtr = new I2CPort;
-		PRINT_1("created");
+		syslog(LOG_INFO,"created");
 	}
 	return I2CPort::myPtr;
 }
@@ -24,23 +24,28 @@ void I2CPort::Release()
 {
 	I2CPort::count--;
 	if(0 == I2CPort::count){
-		PRINT_1("I2CPort released");
+		syslog(LOG_INFO,"I2CPort released");
 		delete I2CPort::myPtr;
 		I2CPort::myPtr = NULL;
 	}
 }
 I2CPort::I2CPort(uint8_t aAdd ){
 	fd = open("/dev/i2c-0",O_RDWR);
-
-	if(fd < 0){
-		PRINT_4("error opening device ");
+	if(fd < 0)
+	{
+		syslog(LOG_ERR,"/dev/i2c-0  error opening device ");
+		fd = open("/dev/i2c-1",O_RDWR);
+		if(fd < 0)
+		{
+			syslog(LOG_ERR,"/dev/i2c-1 error opening device ");
 		throw 1;
+		}
 	}
 
-	PRINT_1(" open device success ");
+	syslog(LOG_INFO," open device success ");
 
 	if( ioctl(fd, I2C_SLAVE, aAdd) < 0){
-		PRINT_4("error setting address");
+		syslog(LOG_ERR,"error setting address");
 		throw 1;
 	}
 
@@ -68,12 +73,12 @@ void I2CPort::setpin(bool state,uint8_t pinNumber)
 //	readPort(); //data will update with latest port data
 	data = state ? (data | 1 << pinNumber) : (data & ~(1 << pinNumber));
 	setPort(data);
-	PRINT_2("i2c data %x",data);
+	syslog(LOG_DEBUG,"i2c data %x",data);
 }
 
 I2CPort::~I2CPort()
 {
-	PRINT_1("port destructor ");
+	syslog(LOG_INFO,"port destructor ");
 	::close(fd);
 }
 
