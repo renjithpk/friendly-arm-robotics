@@ -4,10 +4,10 @@ CFLAGS=-I../inc
 LIBS=-lpthread 
 BIN_DIR = ../bin
 INC_DIR = ../inc
-_DEPS = wheel.h Thread.h engine.h ioport.h types.h Event.h epoll.h
+_DEPS = wheel.h thread.h engine.h ioport.h types.h event.h epoll.h tcpsocket.h
 DEPS = $(patsubst %,$(INC_DIR)/%,$(_DEPS))
 
-_OBJ = Thread.o RoboApp.o wheel.o ioport.o engine.o Event.o Epoll.o my_socket.o
+_OBJ = thread.o roboApp.o wheel.o ioport.o engine.o event.o epoll.o tcpsocket.o
 OBJ = $(patsubst %,$(BIN_DIR)/%,$(_OBJ))
 
 $(BIN_DIR)/%.o: %.cpp $(DEPS)

@@ -1,18 +1,12 @@
 #ifndef _ioport_h
 #define _ioport_h
 
-#include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <linux/fs.h>
-#include <sys/types.h>
 #include <sys/ioctl.h>
-#include <errno.h>
 #include <linux/i2c-dev.h>
 #include "types.h"
-#include <iostream>
-using namespace std;
+
 
 
 class I2CPort

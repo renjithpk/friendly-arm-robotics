@@ -11,8 +11,8 @@ wheel::wheel(char aType, uint16_t aPeriod)
 	syslog(LOG_INFO,"wheelConstructor");
 	timePeriod 	= aPeriod; //1 second;
 	isForward 	= true;
-	onTime 		= timePeriod;
-	offTime 	= 0;
+	onTime 		= 0;
+	offTime 	= timePeriod;
 	port 		= I2CPort::Create();
 	if('L' == aType)
 	{

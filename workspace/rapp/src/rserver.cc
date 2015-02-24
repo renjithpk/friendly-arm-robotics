@@ -1,11 +1,15 @@
 #include "types.h"
-#include "Thread.h"
-#include "my_socket.h"
+#include "thread.h"
+#include "tcpsocket.h"
 #include "cvInterface.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "opencv2/objdetect/objdetect.hpp"
+#include <iostream>
+
+using namespace std;
+
 bool isObjDetected = false;
 //Mat streamImg;
 pthread_mutex_t img_mtx;
