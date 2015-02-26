@@ -53,7 +53,7 @@ int cvIf::detectBall(vector<Vec3f> &circles,Mat &imgOriginal)
 	return circles.size();
 }
 
-int cvIf::displayImgage(Mat &img,const Rect_<int> &rect)
+int cvIf::displayImageWithRect(Mat &img,const Rect_<int> &rect)
 {
 	if(false == isWindowOpened)
 	{		
@@ -74,7 +74,7 @@ int cvIf::displayImgage(Mat &img,const Rect_<int> &rect)
 
 }
 
-int cvIf::drawCircle(Mat &image, vector<Vec3f> &circles)
+int cvIf::displayImgWithCircle(Mat &image, vector<Vec3f> &circles)
 {
 	if(false == isWindowOpened)
 	{		
@@ -118,8 +118,8 @@ cvIf::cvIf(const char *ip)
 	enableCam = true;
 	isWindowOpened = false;
 	isHaarLoaded = false;
-	grayMat_m = Mat::zeros(480,640,CV_8UC1);
-	imgSize = grayMat_m.total()*grayMat_m.elemSize();
+//	grayMat_m = Mat::zeros(480,640,CV_8UC1);
+//	imgSize = grayMat_m.total()*grayMat_m.elemSize();
 	string streamAdd = "http://";
 	streamAdd = streamAdd + ip;
 	streamAdd = streamAdd + ":8080/?action=stream&amp;type=.mjpg";
@@ -136,11 +136,11 @@ cvIf::cvIf(const char *ip)
 
 cvIf::cvIf(bool camera)
 {
-	enableCam = camera;
-	isWindowOpened = false;
-	isHaarLoaded = false;
-	grayMat_m = Mat::zeros(480,640,CV_8UC1);
-	imgSize = grayMat_m.total()*grayMat_m.elemSize();
+	enableCam 		= camera;
+	isWindowOpened 	= false;
+	isHaarLoaded 	= false;
+//	grayMat_m = Mat::zeros(480,640,CV_8UC1);
+//	imgSize = grayMat_m.total()*grayMat_m.elemSize();
 	if(enableCam)
 	{
 		capture.open(0);

@@ -12,11 +12,11 @@ using namespace std;
 
 bool isObjDetected = false;
 //Mat streamImg;
-pthread_mutex_t img_mtx;
+pthread_mutex_t img_mtx = PTHREAD_MUTEX_INITIALIZER;
 Mat img;
 
 
-pthread_mutex_t circle_mtx;
+pthread_mutex_t circle_mtx = PTHREAD_MUTEX_INITIALIZER;
 RCircle rCircle;//x; y;r; maxx; maxy;count;
 
 void copyRCircle(RCircle & c,Vec3f circleVec)
@@ -46,6 +46,7 @@ class CaptureImage:public Thread
 			{
 				cout<<"failed to open stream \n retry...."<<endl;
 				sleep(5);
+				VideoCapture vcap(streamAdd);
 			}
 			vcap>> img;
 			pthread_mutex_unlock(&img_mtx);
@@ -112,7 +113,7 @@ class BallDetector:public Thread
 			countBall = cv.detectBall(circles,copiedImg);
 			if(countBall > 0)
 			{
-				cv.drawCircle(copiedImg,circles);
+				cv.displayImgWithCircle(copiedImg,circles);
 			}
 			else
 			{
@@ -212,11 +213,11 @@ public:
 		{
 			ret = 1;
 			rect = faces[0];
-			cv.displayImgage(img,rect);
+			cv.displayImageWithRect(img,rect);
 		
 		}else
 		{
-			cv.displayImgage(img);
+			cv.displayImageWithRect(img);
 		}
 
 		waitKey(50);	

@@ -86,8 +86,8 @@ class cvIf
 	//int convertImage(Mat &img);
 	int getImgSize();
 	int displayImgage(Mat &img);
-	int displayImgage(Mat &img,const Rect_<int> &rect);
-	int drawCircle(Mat &img,vector<Vec3f> &circles);
+	int displayImageWithRect(Mat &img,const Rect_<int> &rect);
+	int displayImgWithCircle(Mat &img,vector<Vec3f> &circles);
 	int imageFromData(Mat &img,unsigned char * data);
 	int setCascadeFile(const string &file);
 	int detectFace(Mat &img,vector< Rect_<int> > &faces);

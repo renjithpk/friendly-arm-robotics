@@ -33,6 +33,7 @@ RoboApp::RoboApp()
 	engine 	= NULL; //instantiated inside initiazer
 	speed 	= 0;
 	isBlocked = false;
+	cState = new RoboInit;
 }
 
 RoboApp::~RoboApp() {
@@ -64,48 +65,8 @@ bool validate(RCircle &rc_)
 	return false;
 }
 
-int getError(RCircle &data)
-{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-	/*
-	center range x
-	*/
-	if(data.x < 370 && data.x > 220)
-	{	
-		return 0;	
-	}
-	else if(data.x > 350)
-	{
-		return 1;
-	}
-	return -1;
-	
-}
-void rotate()
-{	
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-	engine_p->SetSpeed(20);
-	engine_p->MoveRight(200);
-}
 
-void moveRight()
-{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-	engine_p->SetSpeed(20);
-	engine_p->MoveRight(200);
-	sleep(1);
-	engine_p->SetSpeed(0);
-	sleep(1);
-}
-void moveLeft()
-{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-	engine_p->SetSpeed(20);
-	engine_p->MoveLeft(200);
-	sleep(1);
-	engine_p->SetSpeed(0);
-	sleep(1);
-}
+/*
 #define ST_INIT 0
 #define ST_ROTATE 1
 #define ST_FOUND 2
@@ -223,6 +184,8 @@ void track(bool isObj, void *data = NULL)
 //		break;
 	}
 }
+*/
+
 
 int RoboApp::onNewObject(EMessageT oType,void * data)
 {
@@ -231,14 +194,17 @@ int RoboApp::onNewObject(EMessageT oType,void * data)
 	{	
 		RCircle *rCircle =( RCircle *) data;
 		syslog(LOG_DEBUG,"onNewObject() found  x:%d y:%d r:%d ",rCircle->x,rCircle->y,rCircle->r);
-		track(true,data);
+		//track(true,data);
+		if(cState != NULL) cState->handleBallDetected(*rCircle);
 	}
 	else
 	{
-
-		track(false);
+		//track(false);
+		if(cState != NULL) cState->handleBallNotFound(0);
 		syslog(LOG_DEBUG,"onNewObject() object not found "); 		
 	}
+
+
 	//app_p->requestObj();//TODO change name 
 	//	MSG_Circle msg;
 	//	msg.header.type = DTD_OBJ_BALL;
@@ -246,6 +212,12 @@ int RoboApp::onNewObject(EMessageT oType,void * data)
 }
 
 
+
+void RoboApp::setCurrentState(State *stPtr)
+{
+	delete cState;
+	cState = stPtr;
+}
 
 int RoboApp::onKeyPressed(int ch)
 {
@@ -277,7 +249,8 @@ int RoboApp::onKeyPressed(int ch)
 				//autoMode(engine);
 				break;
 			case 'r':
-				track(false);
+				//track(false);
+				cState->handleTrackBall();
 				//app_p->requestObj();//TODO change name 
 			break;
 			default:
