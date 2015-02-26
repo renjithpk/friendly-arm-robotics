@@ -7,7 +7,7 @@
 #include "event.h"
 #include "thread.h"
 
-pthread_mutex_t cam_mtx;
+pthread_mutex_t cam_mtx = PTHREAD_MUTEX_INITIALIZER;
 class PerDetect: public Thread
 {
 	bool isNewImage;

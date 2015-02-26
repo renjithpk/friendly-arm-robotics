@@ -10,7 +10,7 @@ using namespace std;
 
 I2CPort * I2CPort::myPtr = NULL;
 uint8_t I2CPort::count = 0;
-pthread_mutex_t I2C_mtx;
+pthread_mutex_t I2C_mtx = PTHREAD_MUTEX_INITIALIZER;
 
 I2CPort * I2CPort::Create(){
 	I2CPort::count ++;
