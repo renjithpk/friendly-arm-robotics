@@ -9,27 +9,27 @@
 class KeyIf
 {
 	public:
-	virtual void onKeyPressed(char key) = 0;
+		virtual void onKeyPressed(char key) = 0;
 };
 
 class Key :public EpollIf, public Thread
 {
 	int getKeyFd[2];
 	KeyIf *m_keyif;
-public:
+	public:
 	void init(KeyIf *keyIf)
 	{
 		syslog(LOG_DEBUG, "%s ENTRY",__func__);
 		pipe(getKeyFd);
 
 		m_keyif = keyIf;
-		
+
 		if (pipe(getKeyFd) != -1)
 		{
 			initialize(getKeyFd[0]);
 			Epoll::getInstance()->addFd(this);
 			Start();
-			
+
 		}
 		else
 		{
@@ -44,8 +44,8 @@ public:
 		m_keyif->onKeyPressed(key);
 	}
 
-	
-	
+
+
 	void Execute(void *arg)
 	{
 		syslog(LOG_DEBUG, "%s ENTRY",__func__);
@@ -71,11 +71,11 @@ class AppIf
 {
 
 	public:
-	 
-	 virtual int init(int argc,char *argv[]) {};
-	 virtual int onNewObject(EMessageT oType,void * data) {}
-	 virtual int onKeyPressed(int ch){} 
-	 virtual ~AppIf(){}
+
+		virtual int init(int argc,char *argv[]) {};
+		virtual int onNewObject(EMessageT oType,void * data) {}
+		virtual int onKeyPressed(int ch){} 
+		virtual ~AppIf(){}
 };
 
 
@@ -87,14 +87,14 @@ class App :public SocketIf, public KeyIf
 	int argc;
 	char **argv;
 	string serverIp;
-public:
+	public:
 	App()
 	{}
-	
+
 	App(int argc, char * argv[]):argc(argc),argv(argv)
 	{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-		
+		syslog(LOG_DEBUG, "%s ENTRY",__func__);
+
 		if(argc == 2)
 		{
 			serverIp = 	argv[1];
@@ -106,14 +106,14 @@ public:
 	}
 	int requestObj()
 	{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+		syslog(LOG_DEBUG, "%s ENTRY",__func__);
 		Header headern;
 		headern.type = RQ_OBJ_DETECT;
 		socket.send((unsigned char *)&headern,sizeof(Header));
 	}
 	int initService(void)
 	{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+		syslog(LOG_DEBUG, "%s ENTRY",__func__);
 		socket.registerInterface(this);
 
 		if( -1 == socket.initClient(serverIp, 5000 ))
@@ -122,12 +122,12 @@ public:
 			return -1;
 		}			
 
-		requestObj();
+		//requestObj();
 	}
 
 	int onDataReceived(unsigned char * buffer, int size)
 	{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+		syslog(LOG_DEBUG, "%s ENTRY",__func__);
 		Header *header = (Header*) buffer;
 		syslog(LOG_DEBUG,"on data received");
 		if(NULL == header)
@@ -171,32 +171,33 @@ public:
 
 
 
-		//	MSG_Circle msg;
-		//	msg.header.type = DTD_OBJ_BALL;
-		//	msg.rCircle = temp;
+				//	MSG_Circle msg;
+				//	msg.header.type = DTD_OBJ_BALL;
+				//	msg.rCircle = temp;
 		}
 	}
 	void Register(AppIf * appif)
 	{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+		syslog(LOG_DEBUG, "%s ENTRY",__func__);
 		this->appIf=appif;
 		appIf->init(argc,argv);
 		initGetKey();
 		initService();
 		while(1)
 		{
+			syslog(LOG_INFO,"App Run {epoll->run()}");
 			Epoll::getInstance()->run();
 		}
 		syslog(LOG_ERR,"this is imposible");
 	}
 	int initGetKey()
 	{	
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+		syslog(LOG_DEBUG, "%s ENTRY",__func__);
 		key.init(this);
 	}
 	void onKeyPressed(char key)
 	{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+		syslog(LOG_DEBUG, "%s ENTRY",__func__);
 		appIf->onKeyPressed(key);
 	}
 	//void enableObjectDetect(); TODO

@@ -14,11 +14,12 @@ class Engine {
 	wheel*		pMotorR; // = new wheel(TIME_PERIOD);
 	uint16_t	speed;
 	bool		isForward;
-public:
+	static Engine * my_ptr;
 	Engine();
-	virtual ~Engine();
+public:
 	//set speed for both right and left wheel, and speed will be same
 	void SetSpeed(uint8_t aSpeed);
+	static Engine* getInstance();
 	//true is forward and false is reverse
 	void SetDirection(bool aIsForward);
 	// range 0 - 200, speed will vary from 100 to 200 reverse direction
@@ -27,6 +28,7 @@ public:
 	void Start();
 	void SpeedUp();
 	void SpeedDown();
+	virtual ~Engine();
 };
 
 #endif /* ENGINE_H_ */

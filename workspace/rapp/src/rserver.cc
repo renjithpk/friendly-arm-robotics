@@ -39,7 +39,7 @@ class CaptureImage:public Thread
 
 			pthread_mutex_lock(&img_mtx);
 			string streamAdd = "http://";
-			streamAdd = streamAdd + "192.168.0.100"/*ip*/;
+			streamAdd = streamAdd + "192.168.0.102"/*ip*/;
 			streamAdd = streamAdd + ":8080/?action=stream&amp;type=.mjpg";
 			VideoCapture vcap(streamAdd);
 			while(!vcap.isOpened())
@@ -197,6 +197,7 @@ public:
 			cout<< "Could not accept socket."<<endl;
 			return -1;
 		}	
+		cout<< "client connected"<<endl;
 	}
 
 

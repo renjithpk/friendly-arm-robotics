@@ -10,19 +10,18 @@
 
 //#include "Event.h"
 #include "appFW.h"
-#include "engine.h"
+//#include "engine.h"
 #include "stateMachine.h"
 
 class RoboApp: public AppIf
 {
-	Engine* engine;
-	State*  cState;
+	//Engine* engine;
+	Context context;
 	int 	speed;
-	bool	isBlocked;
+//	bool	isBlocked;
 public:
 	RoboApp();
 	~RoboApp();
-	void setCurrentState(State *stPtr);
 	int init(int argc,char * argv[]);
 	int onNewObject(EMessageT oType,void * data);
 	int onKeyPressed(int ch); 

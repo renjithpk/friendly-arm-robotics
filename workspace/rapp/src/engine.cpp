@@ -7,6 +7,8 @@
 #include "types.h"
 #include "engine.h"
 
+Engine * Engine::my_ptr = NULL;
+
 Engine::Engine()
 {
 	// TODO Auto-generated constructor stub
@@ -15,6 +17,19 @@ Engine::Engine()
 	speed	= 0;
 	isForward = true;
 
+}
+
+Engine *Engine::getInstance()
+{
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+	if(my_ptr == NULL)
+	{
+		my_ptr = new Engine;
+		my_ptr->SetSpeed(0);
+		my_ptr->SetDirection(true);
+		my_ptr->Start();
+	}
+	return my_ptr;
 }
 
 Engine::~Engine()
@@ -52,52 +67,6 @@ void Engine::SetSpeed(uint8_t aSpeed)
 	pMotorR->setSpeed(speed);
 }
 
-
-void Engine::SpeedUp()
-{
-	if(isForward == true)
-	{
-		syslog(LOG_INFO,"increase forward speed");
-		SetSpeed(speed +10);
-	}
-	else
-	{
-		if((speed - 10) < 0)
-		{
-			syslog(LOG_INFO,"change to forward");
-		    SetDirection(true);
-			SetSpeed(10 - speed);
-		}
-		else 
-		{
-			syslog(LOG_INFO,"Decrease reverse speed");
-			SetSpeed(speed - 10);
-		}
-	}
-}
-
-void Engine::SpeedDown()
-{
-	if(isForward == false)
-	{
-		syslog(LOG_INFO,"increase reverse speed");
-		SetSpeed(speed +10);
-	}
-	else
-	{
-		if((speed - 10) < 0)
-		{
-			syslog(LOG_INFO,"change to reverse");
-		    SetDirection(false);
-			SetSpeed(10 - speed);
-		}
-		else 
-		{
-			syslog(LOG_INFO,"decrease forward speed");
-			SetSpeed(speed -10);
-		}
-	}
-}
 //true is forward and false is reverse
 void Engine::SetDirection(bool aIsForward)
 {
@@ -176,4 +145,50 @@ void Engine::MoveLeft(uint8_t aAngle)
 
 	}
 
+}
+
+void Engine::SpeedUp()
+{
+	if(isForward == true)
+	{
+		syslog(LOG_INFO,"increase forward speed");
+		SetSpeed(speed +10);
+	}
+	else
+	{
+		if((speed - 10) < 0)
+		{
+			syslog(LOG_INFO,"change to forward");
+		    SetDirection(true);
+			SetSpeed(10 - speed);
+		}
+		else 
+		{
+			syslog(LOG_INFO,"Decrease reverse speed");
+			SetSpeed(speed - 10);
+		}
+	}
+}
+
+void Engine::SpeedDown()
+{
+	if(isForward == false)
+	{
+		syslog(LOG_INFO,"increase reverse speed");
+		SetSpeed(speed +10);
+	}
+	else
+	{
+		if((speed - 10) < 0)
+		{
+			syslog(LOG_INFO,"change to reverse");
+		    SetDirection(false);
+			SetSpeed(10 - speed);
+		}
+		else 
+		{
+			syslog(LOG_INFO,"decrease forward speed");
+			SetSpeed(speed -10);
+		}
+	}
 }
