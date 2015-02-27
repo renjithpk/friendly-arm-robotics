@@ -16,7 +16,8 @@ typedef short              int16_t;
 typedef unsigned short     uint16_t;
 typedef long long          int64_t;
 typedef unsigned long long uint64_t;
-
+class App;
+extern App *app_gp;
 
 enum EMessageT
 {

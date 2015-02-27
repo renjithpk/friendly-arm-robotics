@@ -6,12 +6,13 @@
  */
 
 #include "roboApp.h"
+#include "types.h"
 
-App *app_p;
-Engine * engine_p;
+App * app_gp = NULL;
 void init_log()
 {
-	    setlogmask(LOG_UPTO(LOG_DEBUG));
+	    setlogmask(LOG_UPTO(LOG_INFO));
+	    //setlogmask(LOG_UPTO(LOG_DEBUG));
 		    openlog("rapp",LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
 }
 
@@ -19,42 +20,98 @@ int main(int argc,char *argv[])
 {
 	init_log();
 	syslog(LOG_NOTICE, "Roboapp started!!%s","test");
-	App app(argc,argv);
+	
 	RoboApp  myapp;
-	app_p = &app;
+	
+	App app(argc,argv); app_gp = &app;
+
 	app.Register(&myapp);
 	return 0;
 }
 
 RoboApp::RoboApp()
 {
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-	// TODO Auto-generated constructor stub
-	engine 	= NULL; //instantiated inside initiazer
-	speed 	= 0;
-	isBlocked = false;
-	cState = new RoboInit;
+//	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 }
 
 RoboApp::~RoboApp() {
 	// TODO Auto-generated destructor stub
-	delete engine;
 }
 
 int RoboApp::init(int argc,char *argv[])
 {
 	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-//	PerDetect pd;
-//	pd.initialize();
-	engine = new Engine();
-	engine_p = engine;
-	engine->SetSpeed(0);
-	engine->Start();
-	engine->SetSpeed(0);
-	sleep(5);
-	engine->SetDirection(true);
 	return 0;
 }
+
+
+int RoboApp::onNewObject(EMessageT oType,void * data)
+{
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+	if(oType == DTD_OBJ_BALL)
+	{
+		RCircle *rCircle =( RCircle *) data;
+		syslog(LOG_DEBUG,"onNewObject() found  x:%d y:%d r:%d ",rCircle->x,rCircle->y,rCircle->r);
+		context.handleBallDetected(*rCircle);
+	}
+	else
+	{
+		context.handleBallNotFound(0);
+		syslog(LOG_DEBUG,"onNewObject() object not found ");
+	}
+}
+
+
+
+
+int RoboApp::onKeyPressed(int ch)
+{
+	Engine * engine = Engine::getInstance();
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+		switch((char) ch)
+		{
+			case '8':
+			case 'a':
+			case 'A':
+				engine->SpeedUp();
+				break;
+			case '2':
+			case 'z':
+			case 'Z':
+				engine->SpeedDown();
+				break;
+			case '4':
+				engine->MoveLeft(100);
+				break;
+			case '6':
+				engine->MoveRight(100);
+				break;
+
+			case '5':
+				engine->SetSpeed(0);
+				break;
+			case 'x':
+			    //ExitApp();
+				//autoMode(engine);
+				break;
+			case 'r':
+				//track(false);
+				context.startTracking();
+				//app_p->requestObj();//TODO change name
+			break;
+			default:
+				return 0;
+				engine->SetSpeed(0);
+
+
+		}
+}
+
+
+
+
+
+/*
 bool validate(RCircle &rc_)
 {
 	syslog(LOG_DEBUG, "%s ENTRY",__func__);
@@ -64,6 +121,8 @@ bool validate(RCircle &rc_)
 	}
 	return false;
 }
+*/
+
 
 
 /*
@@ -186,80 +245,6 @@ void track(bool isObj, void *data = NULL)
 }
 */
 
-
-int RoboApp::onNewObject(EMessageT oType,void * data)
-{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-	if(oType == DTD_OBJ_BALL)
-	{	
-		RCircle *rCircle =( RCircle *) data;
-		syslog(LOG_DEBUG,"onNewObject() found  x:%d y:%d r:%d ",rCircle->x,rCircle->y,rCircle->r);
-		//track(true,data);
-		if(cState != NULL) cState->handleBallDetected(*rCircle);
-	}
-	else
-	{
-		//track(false);
-		if(cState != NULL) cState->handleBallNotFound(0);
-		syslog(LOG_DEBUG,"onNewObject() object not found "); 		
-	}
-
-
-	//app_p->requestObj();//TODO change name 
-	//	MSG_Circle msg;
-	//	msg.header.type = DTD_OBJ_BALL;
-	//	msg.rCircle = temp;
-}
-
-
-
-void RoboApp::setCurrentState(State *stPtr)
-{
-	delete cState;
-	cState = stPtr;
-}
-
-int RoboApp::onKeyPressed(int ch)
-{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-		switch((char) ch)
-		{
-			case '8':
-			case 'a':
-			case 'A':
-				engine->SpeedUp();
-				break;
-			case '2':
-			case 'z':
-			case 'Z':
-				engine->SpeedDown();
-				break;
-			case '4':
-				engine->MoveLeft(100);
-				break;
-			case '6':
-				engine->MoveRight(100);
-				break;
-
-			case '5':
-				engine->SetSpeed(0);
-				break;
-			case 'x':
-			    //ExitApp();
-				//autoMode(engine);
-				break;
-			case 'r':
-				//track(false);
-				cState->handleTrackBall();
-				//app_p->requestObj();//TODO change name 
-			break;
-			default:
-				return 0;
-				engine->SetSpeed(0);
-
-
-		}
-} 
 /*
 //Ir sensor ESensor_IR, state - true/false true => blocked
 bool RoboApp::EventCallBack(ESensor aType, bool state)
