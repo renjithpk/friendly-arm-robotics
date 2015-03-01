@@ -26,7 +26,8 @@ enum EMessageT
  RQ_OBJ_DETECT,
  DTD_OBJ_FACE,
  DTD_OBJ_NOBALL,
- DTD_OBJ_BALL
+ DTD_OBJ_BALL,
+ DTD_OBJ_M_BALL
 };
 struct Header
 {
@@ -37,14 +38,15 @@ struct Header
 class RCircle
 {
 	public:
+	
+	RCircle():x(0),y(0),r(0),count(0)
+	{}
+	RCircle(int val):x(val),y(val),r(val),count(val)
+	{}
 		int x;
 		int y;
 		int r;
-		int maxx;
-		int maxy;
 		int count;
-
-
 };
 
 struct MSG_Circle
