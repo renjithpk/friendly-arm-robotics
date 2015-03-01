@@ -9,7 +9,8 @@
 #define STATEMACHINE_H_
 #include "cvInterface.h"
 #include "engine.h"
-//#include "Context.h"
+
+
 class State;
 
 
@@ -20,10 +21,9 @@ class Context
 	State*  cState;
 	void setCurrentState(State *stPtr);
 	int handleBallDetected(EMessageT oType, RCircle &rCircle);
-	int handleBallNotFound(EMessageT oType, int count);
+	int handleBallNone(EMessageT oType, int count = -1);
 	int getError(RCircle &data);
 	void startTracking();
-	//TODO move this to engine
 	void rotate(char dir);
 	void moveRight();
 	void moveLeft();
@@ -32,18 +32,15 @@ class Context
 
 class State
 {
-//	Engine* engine;
 public:
 	Context & context;
 	State(Context & ctxt);
 	virtual ~State();
-//	virtual int handleTrackBall();
-	virtual int handleBallDetected(RCircle &rCircle);
-	virtual int handleBallNotFound(int count);
 	virtual int handleBallOnRight(RCircle &rCircle,int err);
 	virtual int handleBallOnLeft(RCircle &rCircle,int err);
 	virtual int handleBallOnCenter(RCircle &rCircle,int err);
-	virtual int handleMultipleBall(RCircle &rCircle,int err);
+	virtual int handleBallNotFound(int count = -1);
+	virtual int handleMultipleBall();
 };
 
 class BallLocked: public State
@@ -51,12 +48,11 @@ class BallLocked: public State
 public:
 	BallLocked(Context &ctxt);
 	virtual ~BallLocked();
-	int handleBallDetected(RCircle &rCircle);
-	int handleBallNotFound(int count);
 	int handleBallOnRight(RCircle &rCircle,int err);
 	int handleBallOnLeft(RCircle &rCircle,int err);
 	int handleBallOnCenter(RCircle &rCircle,int err);
-	int handleMultipleBall(RCircle &rCircle,int err);
+	int handleBallNotFound(int count);
+	int handleMultipleBall();
 };
 
 class BallOnLeft: public State
@@ -64,12 +60,11 @@ class BallOnLeft: public State
 public:
 	BallOnLeft(Context &ctxt);
 	virtual ~BallOnLeft();
-	int handleBallDetected(RCircle &rCircle);
-	int handleBallNotFound(int count);
 	int handleBallOnRight(RCircle &rCircle,int err);
 	int handleBallOnLeft(RCircle &rCircle,int err);
 	int handleBallOnCenter(RCircle &rCircle,int err);
-	int handleMultipleBall(RCircle &rCircle,int err);
+	int handleBallNotFound(int count);
+	int handleMultipleBall();
 };
 
 class BallOnRight: public State
@@ -77,12 +72,11 @@ class BallOnRight: public State
 public:
 	BallOnRight(Context &ctxt);
 	virtual ~BallOnRight();
-	int handleBallDetected(RCircle &rCircle);
-	int handleBallNotFound(int count);
 	int handleBallOnRight(RCircle &rCircle,int err);
 	int handleBallOnLeft(RCircle &rCircle,int err);
 	int handleBallOnCenter(RCircle &rCircle,int err);
-	int handleMultipleBall(RCircle &rCircle,int err);
+	int handleBallNotFound(int count);
+	int handleMultipleBall();
 };
 
 
@@ -91,13 +85,11 @@ class RoboInit: public State
 public:
 	RoboInit(Context &ctxt);//:State(ctxt) {}
 	virtual ~RoboInit();
-	//virtual int handleTrackBall();
-	int handleBallDetected(RCircle &rCircle);
-	int handleBallNotFound(int count);
 	int handleBallOnRight(RCircle &rCircle,int err);
 	int handleBallOnLeft(RCircle &rCircle,int err);
 	int handleBallOnCenter(RCircle &rCircle,int err);
-	int handleMultipleBall(RCircle &rCircle,int err);
+	int handleBallNotFound(int count);
+	int handleMultipleBall();
 };
 
 #endif /* STATEMACHINE_H_ */
