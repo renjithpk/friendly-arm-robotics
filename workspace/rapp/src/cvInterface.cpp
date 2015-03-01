@@ -4,16 +4,6 @@
 using namespace std;
 
 
-int cvIf::displayImgage(Mat &img)
-{
-	if(false == isWindowOpened)
-	{		
-		isWindowOpened = true;
-		namedWindow("Robo", CV_WINDOW_AUTOSIZE);
-	}
-	imshow("Robo", img);
-
-}
 
 cvIf::~cvIf()
 {
@@ -53,12 +43,34 @@ int cvIf::detectBall(vector<Vec3f> &circles,Mat &imgOriginal)
 	return circles.size();
 }
 
+int cvIf::displayImgage(Mat &img,const string &str)
+{
+	if(false == isWindowOpened)
+	{		
+		isWindowOpened = true;
+		namedWindow("Robo", CV_WINDOW_NORMAL);
+	}
+	if(!str.empty())
+	{
+			putText(img, str,
+					cvPoint(30,30),  //text origin
+					FONT_HERSHEY_COMPLEX_SMALL, //font type
+					0.8, 						//font scale
+					cvScalar(255,0,0),	
+					1, //thickness
+					CV_AA);
+	}
+	imshow("Robo", img);
+	waitKey(30);
+}
+
+
 int cvIf::displayImageWithRect(Mat &img,const Rect_<int> &rect)
 {
 	if(false == isWindowOpened)
 	{		
 		isWindowOpened = true;
-		namedWindow("Robo", CV_WINDOW_AUTOSIZE);
+		namedWindow("Robo", CV_WINDOW_NORMAL);
 	}
 
 	cv::rectangle(
@@ -71,17 +83,26 @@ int cvIf::displayImageWithRect(Mat &img,const Rect_<int> &rect)
 			);
 	//cout<<"size  "<<faces[i].width*faces[i].height<<" x "<<faces[i].x<<" y"<<faces[i].y<<endl;
 	imshow("Robo", img);
-
+	waitKey(30);
 }
 
-int cvIf::displayImgWithCircle(Mat &image, vector<Vec3f> &circles)
+int cvIf::displayImgWithCircle(Mat &image, vector<Vec3f> &circles,const string &str)
 {
 	if(false == isWindowOpened)
 	{		
 		isWindowOpened = true;
 		namedWindow("Robo", CV_WINDOW_AUTOSIZE);
 	}
-	
+	if(!str.empty())
+	{
+			putText(image, str,
+					cvPoint(30,30),  //text origin
+					FONT_HERSHEY_COMPLEX_SMALL, //font type
+					0.8, 						//font scale
+					cvScalar(0,255,0),	
+					1, //thickness
+					CV_AA);
+	}
 	for( size_t i = 0; i < circles.size(); i++ )
 	{
 		Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
@@ -90,7 +111,7 @@ int cvIf::displayImgWithCircle(Mat &image, vector<Vec3f> &circles)
 		circle(image, center, radius, Scalar(0,0,255), 3, 8, 0 );
 	}
 	imshow("Robo",image);
-
+	waitKey(30);
 	return 0;
 }
 int cvIf::setCascadeFile(const string &file)

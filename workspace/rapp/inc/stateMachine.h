@@ -19,8 +19,8 @@ class Context
 	Context();
 	State*  cState;
 	void setCurrentState(State *stPtr);
-	int handleBallDetected(RCircle &rCircle);
-	int handleBallNotFound(int count);
+	int handleBallDetected(EMessageT oType, RCircle &rCircle);
+	int handleBallNotFound(EMessageT oType, int count);
 	int getError(RCircle &data);
 	void startTracking();
 	//TODO move this to engine
@@ -40,6 +40,10 @@ public:
 //	virtual int handleTrackBall();
 	virtual int handleBallDetected(RCircle &rCircle);
 	virtual int handleBallNotFound(int count);
+	virtual int handleBallOnRight(RCircle &rCircle,int err);
+	virtual int handleBallOnLeft(RCircle &rCircle,int err);
+	virtual int handleBallOnCenter(RCircle &rCircle,int err);
+	virtual int handleMultipleBall(RCircle &rCircle,int err);
 };
 
 class BallLocked: public State
@@ -49,6 +53,10 @@ public:
 	virtual ~BallLocked();
 	int handleBallDetected(RCircle &rCircle);
 	int handleBallNotFound(int count);
+	int handleBallOnRight(RCircle &rCircle,int err);
+	int handleBallOnLeft(RCircle &rCircle,int err);
+	int handleBallOnCenter(RCircle &rCircle,int err);
+	int handleMultipleBall(RCircle &rCircle,int err);
 };
 
 class BallOnLeft: public State
@@ -58,6 +66,10 @@ public:
 	virtual ~BallOnLeft();
 	int handleBallDetected(RCircle &rCircle);
 	int handleBallNotFound(int count);
+	int handleBallOnRight(RCircle &rCircle,int err);
+	int handleBallOnLeft(RCircle &rCircle,int err);
+	int handleBallOnCenter(RCircle &rCircle,int err);
+	int handleMultipleBall(RCircle &rCircle,int err);
 };
 
 class BallOnRight: public State
@@ -67,6 +79,10 @@ public:
 	virtual ~BallOnRight();
 	int handleBallDetected(RCircle &rCircle);
 	int handleBallNotFound(int count);
+	int handleBallOnRight(RCircle &rCircle,int err);
+	int handleBallOnLeft(RCircle &rCircle,int err);
+	int handleBallOnCenter(RCircle &rCircle,int err);
+	int handleMultipleBall(RCircle &rCircle,int err);
 };
 
 
@@ -78,6 +94,10 @@ public:
 	//virtual int handleTrackBall();
 	int handleBallDetected(RCircle &rCircle);
 	int handleBallNotFound(int count);
+	int handleBallOnRight(RCircle &rCircle,int err);
+	int handleBallOnLeft(RCircle &rCircle,int err);
+	int handleBallOnCenter(RCircle &rCircle,int err);
+	int handleMultipleBall(RCircle &rCircle,int err);
 };
 
 #endif /* STATEMACHINE_H_ */

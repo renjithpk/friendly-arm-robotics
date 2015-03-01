@@ -151,6 +151,7 @@ class App :public SocketIf, public KeyIf
 				break;
 			case DTD_OBJ_NOBALL:
 			case DTD_OBJ_BALL:
+			case DTD_OBJ_M_BALL:
 				{
 					if(appIf != NULL)
 					{

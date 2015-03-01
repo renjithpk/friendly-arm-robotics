@@ -52,11 +52,11 @@ int RoboApp::onNewObject(EMessageT oType,void * data)
 	{
 		RCircle *rCircle =( RCircle *) data;
 		syslog(LOG_DEBUG,"onNewObject() found  x:%d y:%d r:%d ",rCircle->x,rCircle->y,rCircle->r);
-		context.handleBallDetected(*rCircle);
+		context.handleBallDetected(oType,*rCircle);
 	}
 	else
 	{
-		context.handleBallNotFound(0);
+		context.handleBallNotFound(oType,0);
 		syslog(LOG_DEBUG,"onNewObject() object not found ");
 	}
 }

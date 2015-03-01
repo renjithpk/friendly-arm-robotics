@@ -21,7 +21,7 @@ void Context::setCurrentState(State *stPtr)
 	cState = stPtr;
 }
 
-int Context::handleBallNotFound(int count)
+int Context::handleBallNotFound(EMessageT oType,int count)
 {
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
 	if(NULL != cState) cState->handleBallNotFound(count);
@@ -29,7 +29,7 @@ int Context::handleBallNotFound(int count)
 
 
 
-int Context::handleBallDetected(RCircle & rCircle)
+int Context::handleBallDetected(EMessageT oType,RCircle & rCircle)
 {
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
 	if(NULL != cState) cState->handleBallDetected(rCircle);
@@ -110,6 +110,22 @@ int State::handleBallNotFound(int count)
 {
 	syslog(LOG_INFO, "%s ENTRY",__func__);
 }
+int State::handleBallOnRight(RCircle &rCircle,int err)
+{
+	
+}
+int State::handleBallOnLeft(RCircle &rCircle,int err)
+{
+	
+}
+int State::handleBallOnCenter(RCircle &rCircle,int err)
+{
+	
+}
+int State::handleMultipleBall(RCircle &rCircle,int err)
+{
+
+}
 ///////////////////////  ROBO INIT ///////////////////////
 
 RoboInit::RoboInit(Context &ctxt):State(ctxt)
@@ -147,6 +163,22 @@ int RoboInit::handleBallNotFound(int count)
 	context.rotate('R');
 	sleep(1);
 	app_gp->requestObj();
+}
+int RoboInit::handleBallOnRight(RCircle &rCircle,int err)
+{
+	
+}
+int RoboInit::handleBallOnLeft(RCircle &rCircle,int err)
+{
+	
+}
+int RoboInit::handleBallOnCenter(RCircle &rCircle,int err)
+{
+	
+}
+int RoboInit::handleMultipleBall(RCircle &rCircle,int err)
+{
+
 }
 /////////////////////// BALL ON RIGHT ///////////////////////
 
@@ -188,6 +220,22 @@ int BallOnRight::handleBallNotFound(int count)
 	app_gp->requestObj();
 
 }
+int BallOnRight::handleBallOnRight(RCircle &rCircle,int err)
+{
+	
+}
+int BallOnRight::handleBallOnLeft(RCircle &rCircle,int err)
+{
+	
+}
+int BallOnRight::handleBallOnCenter(RCircle &rCircle,int err)
+{
+	
+}
+int BallOnRight::handleMultipleBall(RCircle &rCircle,int err)
+{
+
+}
 
 
 //////////////////// BALL ON LEFT /////////////////////////////
@@ -226,6 +274,22 @@ int BallOnLeft::handleBallNotFound(int count)
 	context.rotate('L');
 	sleep(1);
 	app_gp->requestObj();
+}
+int BallOnLeft::handleBallOnRight(RCircle &rCircle,int err)
+{
+	
+}
+int BallOnLeft::handleBallOnLeft(RCircle &rCircle,int err)
+{
+	
+}
+int BallOnLeft::handleBallOnCenter(RCircle &rCircle,int err)
+{
+	
+}
+int BallOnLeft::handleMultipleBall(RCircle &rCircle,int err)
+{
+
 }
 
 //////////////////////// BALL LOCKED  ////////////////////////////
@@ -282,4 +346,20 @@ int BallLocked::handleBallNotFound(int count)
 	context.moveRight();	
 	context.setCurrentState(new BallOnRight(context));	
 	app_gp->requestObj();//TODO change name
+}
+int BallLocked::handleBallOnRight(RCircle &rCircle,int err)
+{
+	
+}
+int BallLocked::handleBallOnLeft(RCircle &rCircle,int err)
+{
+	
+}
+int BallLocked::handleBallOnCenter(RCircle &rCircle,int err)
+{
+	
+}
+int BallLocked::handleMultipleBall(RCircle &rCircle,int err)
+{
+
 }

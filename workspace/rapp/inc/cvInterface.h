@@ -28,20 +28,21 @@ public:
 	int mMinR;
 	Tracker():name("Controller")
 	{
-		mLowH = 43;
-		mHighH = 86;
-		mLowS = 102; 
-		mHighS = 167;
-		mLowV = 93;
-		mHighV = 148;
-		mThrEd = 29;
-		mThrCd = 32;
+		mLowH = 60;
+		mHighH = 90;
+		mLowS = 65; 
+		mHighS = 150;
+		mLowV = 85;
+		mHighV = 190;
+		mThrEd = 50;
+		mThrCd = 30;
 		mMinR = 20;
 	}
 
 	int create()
 	{
-		namedWindow(name, CV_WINDOW_AUTOSIZE); //create a window called "Control"
+		namedWindow(name, CV_WINDOW_NORMAL); //create a window called "Control"
+		namedWindow("Filtered", CV_WINDOW_NORMAL); //create a window called "Control"
 		//Creattrackers
 		cvCreateTrackbar("LowH", name, &mLowH, 179); //Hue (0 - 179)
 		cvCreateTrackbar("HighH", name, &mHighH, 179);
@@ -59,7 +60,7 @@ public:
 	}
 	int displayImgage(Mat &img)
 	{
-		imshow(name, img);
+		imshow("Filtered", img);
 		return 0;
 	}
 };
@@ -85,9 +86,9 @@ class cvIf
 	Mat * getImage();
 	//int convertImage(Mat &img);
 	int getImgSize();
-	int displayImgage(Mat &img);
+	int displayImgage(Mat &img,const string &str = "");
 	int displayImageWithRect(Mat &img,const Rect_<int> &rect);
-	int displayImgWithCircle(Mat &img,vector<Vec3f> &circles);
+	int displayImgWithCircle(Mat &img,vector<Vec3f> &circles,const string &str = "");
 	int imageFromData(Mat &img,unsigned char * data);
 	int setCascadeFile(const string &file);
 	int detectFace(Mat &img,vector< Rect_<int> > &faces);
