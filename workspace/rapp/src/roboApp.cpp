@@ -56,7 +56,7 @@ int RoboApp::onNewObject(EMessageT oType,void * data)
 	}
 	else
 	{
-		context.handleBallNotFound(oType,0);
+		context.handleBallNone(oType,0);
 		syslog(LOG_DEBUG,"onNewObject() object not found ");
 	}
 }
