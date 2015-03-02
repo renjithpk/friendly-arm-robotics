@@ -7,7 +7,7 @@
 
 #include "roboApp.h"
 #include "types.h"
-
+#include "iostream"
 App * app_gp = NULL;
 void init_log()
 {
@@ -20,7 +20,8 @@ int main(int argc,char *argv[])
 {
 	init_log();
 	syslog(LOG_NOTICE, "Roboapp started!!%s","test");
-	
+	std::cout<<"Press 'x' for exit"<<endl;	
+	std::cout<<"up-8 or a, down-2 or z,left-4, right-6, stop-5 "<<endl;	
 	RoboApp  myapp;
 	
 	App app(argc,argv); app_gp = &app;
@@ -81,23 +82,20 @@ int RoboApp::onKeyPressed(int ch)
 				engine->SpeedDown();
 				break;
 			case '4':
-				engine->MoveLeft(100);
+				engine->MoveLeft(70);
 				break;
 			case '6':
-				engine->MoveRight(100);
+				engine->MoveRight(70);
 				break;
 
 			case '5':
 				engine->SetSpeed(0);
 				break;
 			case 'x':
-			    //ExitApp();
-				//autoMode(engine);
+			    app_gp->exit();
 				break;
 			case 'r':
-				//track(false);
 				context.startTracking();
-				//app_p->requestObj();//TODO change name
 			break;
 			default:
 				return 0;
@@ -126,123 +124,6 @@ bool validate(RCircle &rc_)
 
 
 /*
-#define ST_INIT 0
-#define ST_ROTATE 1
-#define ST_FOUND 2
-#define ST_ADJUST_POS 3
-#define ST_ADJUSTED 4
-#define ST_ADJUSTERR 5
-int rBstate = ST_INIT;
-void track(bool isObj, void *data = NULL)
-{
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
-	switch (rBstate)
-	{
-		case ST_INIT:
-			{
-				syslog(LOG_INFO,"stateInit");
-				if(!isObj)
-				{
-					rotate();
-					rBstate = ST_ROTATE; 
-					app_p->requestObj();//TODO change name
-				}
-				else
-				{
-					rBstate = ST_FOUND;
-					engine_p->SetSpeed(0);
-					app_p->requestObj();//TODO change name
-				}
-			}
-			break;
-		case ST_ROTATE:
-			{
-				syslog(LOG_INFO,"state ROtate");
-				if(isObj)
-				{
-					rBstate = ST_FOUND;
-					engine_p->SetSpeed(0);
-					track(isObj,data);
-				}
-				app_p->requestObj();//TODO change name 
-			}
-			break;
-		case ST_FOUND:
-			{
-				syslog(LOG_INFO,"state Found");
-				if(!isObj)
-				{
-					rBstate = ST_INIT;
-					app_p->requestObj();
-					break;
-				}
-				if(NULL == data)
-				{
-					syslog(LOG_ERR,"data NULL");
-					app_p->requestObj();//TODO change name 
-				break;
-				}
-				int err = getError(*((RCircle *)data) );
-				syslog(LOG_INFO,"Err: %d",err);
-				if(err >0)
-				{
-					moveRight();	
-					app_p->requestObj();//TODO change name 
-				}
-				else if(err <0)
-				{
-					moveLeft();	
-					app_p->requestObj();//TODO change name 
-				}
-				else
-				{
-					syslog(LOG_INFO,"state Found ADJUSTED ******");
-					rBstate = ST_ADJUSTED;
-					app_p->requestObj();//TODO change name 
-					//track(isObj,data);
-				}
-			}
-			break;
-		case ST_ADJUSTED:
-		{
-			if(!isObj)
-			{
-				rBstate = ST_INIT;
-				app_p->requestObj();
-				break;
-			}
-			
-			if(NULL == data)
-			{
-				syslog(LOG_ERR,"data NULL");
-				app_p->requestObj();//TODO change name 
-				break;
-			}
-			
-			int err = getError(*((RCircle *)data) );
-
-			if(err != 0) 
-			{
-					syslog(LOG_INFO,"ADJUST error ******");
-					rBstate = ST_FOUND;
-					engine_p->SetSpeed(0);
-					track(isObj,data);
-			}else
-			{
-					syslog(LOG_INFO,"state Found ADJUSTED ******");
-					rBstate = ST_ADJUSTED;	
-					app_p->requestObj();//TODO change name 
-			}
-		//	rBstate = ST_ADJUSTERR;
-		}
-		break;
-//		case ST_ADJUSTERR:
-//		{
-//			}
-//		}
-//		break;
-	}
-}
 */
 
 /*

@@ -30,7 +30,6 @@ class wheel :  public Thread
 public:
 
 	wheel(char aType, uint16_t aPeriod = 45535);
-	//void run();
 	void setSpeed(uint8_t speed);
 	void setDirection(bool aIsforward);
 	void turnOn();

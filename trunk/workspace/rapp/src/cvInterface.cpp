@@ -1,3 +1,4 @@
+
 #include "cvInterface.h"
 #include <iostream>
 
@@ -229,6 +230,44 @@ int cvIf::convertImage(Mat &img)
 }*/
 
 
+
+Tracker::Tracker():name("Controller")
+{
+	mLowH = 60;
+	mHighH = 90;
+	mLowS = 65; 
+	mHighS = 150;
+	mLowV = 85;
+	mHighV = 190;
+	mThrEd = 50;
+	mThrCd = 30;
+	mMinR = 20;
+}
+
+int Tracker::create()
+{
+	namedWindow(name, CV_WINDOW_NORMAL); //create a window called "Control"
+	namedWindow("Filtered", CV_WINDOW_NORMAL); //create a window called "Control"
+	//Creattrackers
+	cvCreateTrackbar("LowH", name, &mLowH, 179); //Hue (0 - 179)
+	cvCreateTrackbar("HighH", name, &mHighH, 179);
+
+	cvCreateTrackbar("LowS", name, &mLowS, 255); //Saturation (0 - 255)
+	cvCreateTrackbar("HighS", name, &mHighS, 255);
+
+	cvCreateTrackbar("LowV", name, &mLowV, 255); //Value (0 - 255)
+	cvCreateTrackbar("HighV", name, &mHighV, 255);
+
+	cvCreateTrackbar("ThrEd", name, &mThrEd, 255); //Value (0 - 255)
+	cvCreateTrackbar("ThrCd", name, &mThrCd, 255);
+	cvCreateTrackbar("minR", name, &mMinR, 255);
+	return 0;
+}
+int Tracker::displayImgage(Mat &img)
+{
+	imshow("Filtered", img);
+	return 0;
+}
 
 
 
