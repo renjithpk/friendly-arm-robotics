@@ -13,7 +13,6 @@
 #include <arpa/inet.h>
 
 #include "epoll.h"
-//using namespace std;
 
 const int MAXHOSTNAME = 200;
 const int MAXCONNECTIONS = 5;

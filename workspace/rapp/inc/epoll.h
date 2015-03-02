@@ -11,7 +11,7 @@
 using namespace std;
 
 
-
+//------ HOW TO -------
 //derive class to be listned
 //call initialize with fd
 //Epoll::getInstance()->addFd(this);

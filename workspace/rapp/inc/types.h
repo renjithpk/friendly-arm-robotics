@@ -76,29 +76,4 @@ LOG_INFO       informational message
 LOG_DEBUG      debug-level message
 */
 
-/*
-#define INFO_ON
-//#define DEBUG_ON
-//#define WARNING_ON
-#define ERROR_ON
-
-#ifdef INFO_ON
-	#define PRINT_1(...) printf(__VA_ARGS__);printf("\n")
-#else
-	#define PRINT_1(...)
-#endif
-
-#ifdef DEBUG_ON
-	#define PRINT_2(...) printf( __VA_ARGS__);printf("\n")
-#else
-	#define PRINT_2(...)
-#endif
-
-#ifdef WARNING_ON
-	#define PRINT_3(...) printf(__VA_ARGS__);printf("\n")
-#else
-	#define PRINT_3(...)
-#endif
-#define PRINT_4(...) printf(__VA_ARGS__);printf("\n")
-*/
 #endif /* TYPES_H_ */
