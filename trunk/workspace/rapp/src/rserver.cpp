@@ -12,15 +12,15 @@ using namespace std;
 
 string ip_addr="";// = argv[1];
 
-pthread_mutex_t gui_mtx = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t gui_mtx = PTHREAD_MUTEX_INITIALIZER;
 
 void tSwaitKey(int time)
 {
-	if(0 == pthread_mutex_trylock(&gui_mtx))
-	{
+//	if(0 == pthread_mutex_trylock(&gui_mtx))
+//	{
 		waitKey(time);
-		pthread_mutex_unlock(&gui_mtx);
-	}
+//		pthread_mutex_unlock(&gui_mtx);
+//	}
 }
 
 //Mat streamImg;
@@ -156,9 +156,9 @@ class BallDetector:public Thread
 
 	void Execute(void*)
 	{
-		pthread_mutex_lock(&gui_mtx);
+		//pthread_mutex_lock(&gui_mtx);
 		cv.createBallTracker();
-		pthread_mutex_unlock(&gui_mtx);
+		//pthread_mutex_unlock(&gui_mtx);
 
 		//waitKey(50);
 		while(1)
@@ -173,29 +173,34 @@ class BallDetector:public Thread
 	int detectBall()
 	{
 		int countBall = 0;
-		RCircle trCircle;
+		static RCircle trCircle;
 		vector<Vec3f> circles;
 		Mat copiedImg;
 		static std::stringstream sstm;
 		CaptureImage::readImage(copiedImg);
 		countBall = cv.detectBall(circles,copiedImg);
+		
+		int nonZeros =cv.getNzOfLast();
 		if(countBall > 0)
 		{
 			sstm.str("");
 			copyRCircle(trCircle, circles[0]);
 			objectState(countBall,trCircle);
-			sstm<<image_size.width<<"x"<<image_size.height<<"   [x : y : r] ["<<trCircle.x<<" : "<<trCircle.y<<" : "<<trCircle.r<<"]    "<<(int)state;
+			sstm<<image_size.width<<"x"<<image_size.height<<"   [x : y : r] ["<<trCircle.x<<" : "<<
+				trCircle.y<<" : "<<trCircle.r<<"]    "<<(int)state<<" nz "<<nonZeros;
 			
-			pthread_mutex_lock(&gui_mtx);
+			//pthread_mutex_lock(&gui_mtx);
 			cv.displayImgWithCircle(copiedImg,circles,sstm.str());
-			pthread_mutex_unlock(&gui_mtx);
+			//pthread_mutex_unlock(&gui_mtx);
 		}
 		else
 		{
 			objectState(countBall);
-			pthread_mutex_lock(&gui_mtx);
+			//pthread_mutex_lock(&gui_mtx);
+			sstm<<image_size.width<<"x"<<image_size.height<<"   [x : y : r] ["<<trCircle.x<<" : "<<
+				trCircle.y<<" : "<<trCircle.r<<"]    "<<(int)state<<" nz "<<nonZeros;
 			cv.displayImgage(copiedImg,sstm.str());
-			pthread_mutex_unlock(&gui_mtx);
+			//pthread_mutex_unlock(&gui_mtx);
 		}
 		return countBall;
 	}

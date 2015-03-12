@@ -43,6 +43,7 @@ class cvIf
 	Tracker tracker;
 	//CascadeClassifier *haar_cascade_p;
 	string cascadeFile_m;	
+	Mat imgThresholded;
 	public:
 	~cvIf();
 	cvIf(bool camera = false);
@@ -58,6 +59,7 @@ class cvIf
 	int detectFace(Mat &img,vector< Rect_<int> > &faces);
 	int createBallTracker();
 	int detectBall(vector<Vec3f> &circles, Mat &imgOriginal);
+	int getNzOfLast();
 	VideoCapture& getCapture();
 
 };
