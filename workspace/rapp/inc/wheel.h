@@ -29,7 +29,7 @@ class wheel :  public Thread
 	virtual void Execute(void*);
 public:
 
-	wheel(char aType, uint16_t aPeriod = 45535);
+	wheel(char aType, uint16_t aPeriod = 4553);
 	void setSpeed(uint8_t speed);
 	void setDirection(bool aIsforward);
 	void turnOn();

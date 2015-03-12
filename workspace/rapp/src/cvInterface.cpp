@@ -19,7 +19,6 @@ int cvIf::detectBall(vector<Vec3f> &circles,Mat &imgOriginal)
 	Mat imgHSV;
 	cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
 	//imgHSV = imgOriginal;
-	Mat imgThresholded;
 
 	inRange(imgHSV, Scalar(tracker.mLowH, tracker.mLowS, tracker.mLowV), Scalar(tracker.mHighH, tracker.mHighS, tracker.mHighV), imgThresholded); //Threshold the image
 
@@ -44,6 +43,10 @@ int cvIf::detectBall(vector<Vec3f> &circles,Mat &imgOriginal)
 	return circles.size();
 }
 
+int cvIf::getNzOfLast()
+{
+	return 	countNonZero(imgThresholded);
+}
 int cvIf::displayImgage(Mat &img,const string &str)
 {
 	if(false == isWindowOpened)

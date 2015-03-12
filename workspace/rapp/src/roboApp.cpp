@@ -34,6 +34,11 @@ RoboApp::RoboApp()
 {
 //	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 }
+/*
+int RoboApp::onExit()
+{
+	//TODO	
+}*/
 
 RoboApp::~RoboApp() {
 	// TODO Auto-generated destructor stub
