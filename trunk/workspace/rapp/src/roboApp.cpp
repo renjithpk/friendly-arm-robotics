@@ -101,6 +101,8 @@ int RoboApp::onKeyPressed(int ch)
 				break;
 			case 'r':
 				context.startTracking();
+
+
 			break;
 			default:
 				return 0;
