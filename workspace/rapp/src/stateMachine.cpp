@@ -70,7 +70,7 @@ void Context::startTracking()
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
 	app_gp->requestObj();//TODO change name 
 }
-
+bool lastStateRight = true; 
 //CONTEXT
 int Context::getError(RCircle &data)
 {
@@ -183,40 +183,48 @@ int RoboInit::handleBallNotFound(int count)
 	Engine * engine = Engine::getInstance();
 	engine->SetDirection(true);
 	engine->SetSpeed(40);
-	engine->MoveRight(200);
-	//sleep(1);
+	if(lastStateRight)
+	{
+		engine->MoveRight(200);
+	}//sleep(1);
+	else
+	{
+		engine->MoveLeft(200);
+	}
 	struct timespec tim, tim2;
-   	tim.tv_sec = 1;
-   	tim.tv_nsec = 10000000L;
+   	tim.tv_sec = 0;
+   	tim.tv_nsec = 600000000L;
 	nanosleep(&tim , &tim2);
 	engine->SetSpeed(20);
-	engine->MoveRight(200);
-	sleep(1);
+   	tim.tv_nsec = 600000000L;
+	nanosleep(&tim , &tim2);
+	//engine->MoveRight(0);
 	app_gp->requestObj();
+	sleep(1);
 }
 int RoboInit::handleBallOnRight(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
+	app_gp->requestObj();
 	Engine * engine = Engine::getInstance();
 	engine->SetDirection(true);
-	engine->SetSpeed(20);
-	engine->MoveLeft(200);
-	sleep(1);
+	//engine->SetSpeed(20);
+	//engine->MoveLeft(200);
+	//sleep(1);
 	engine->SetSpeed(0);
 	context.setCurrentState(new BallOnRight(context));
-	app_gp->requestObj();
 }
 int RoboInit::handleBallOnLeft(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
+	app_gp->requestObj();
 	Engine * engine = Engine::getInstance();
 	engine->SetDirection(true);
-	engine->SetSpeed(20);
-	engine->MoveLeft(200);
-	sleep(1);
+	//engine->SetSpeed(20);
+	//engine->MoveLeft(200);
+	//sleep(1);
 	engine->SetSpeed(0);
 	context.setCurrentState(new BallOnLeft(context));
-	app_gp->requestObj();
 }
 int RoboInit::handleBallOnCenter(RCircle &rCircle,int err)
 {
@@ -246,6 +254,7 @@ int RoboInit::handleMultipleBall()
 BallOnRight::BallOnRight(Context &ctxt):State(ctxt)
 {
 	syslog(LOG_INFO, "%s ENTRY",__func__);
+	lastStateRight = true;
 }
 
 BallOnRight::~BallOnRight()
@@ -305,6 +314,7 @@ int BallOnRight::handleMultipleBall()
 BallOnLeft::BallOnLeft(Context &ctxt):State(ctxt)
 {
 	syslog(LOG_INFO, "BallOnLeft::%s ENTRY",__func__);
+	lastStateRight = false;
 }
 BallOnLeft::~BallOnLeft()
 {

@@ -37,7 +37,9 @@ enum Enum_ObjState
 	//		OBJ_STATE_CONFIRED,  
 	//		OBJ_STATE_M_CONFIRMED,
 	OBJ_STATE_M_DETECTED,
-	OBJ_STATE_NONE
+	OBJ_STATE_M_DETECTED_C,
+	OBJ_STATE_NONE,
+	OBJ_STATE_NONE_C
 };
 static Enum_ObjState state = OBJ_STATE_INIT;
 
@@ -180,7 +182,7 @@ class BallDetector:public Thread
 		CaptureImage::readImage(copiedImg);
 		countBall = cv.detectBall(circles,copiedImg);
 		
-		int nonZeros =cv.getNzOfLast();
+		int nonZeros =0;//cv.getNzOfLast();
 		if(countBall > 0)
 		{
 			sstm.str("");
@@ -218,8 +220,7 @@ class BallDetector:public Thread
 				}else if(noOfCircle == 1)
 				{
 					state = OBJ_STATE_DETECTED;
-					CaptureImage::setRCircle(rcircle);
-					//store RCircle
+					objectState(noOfCircle,rcircle);
 				}
 				else
 				{
@@ -244,6 +245,7 @@ class BallDetector:public Thread
 				}
 			break;
 			case OBJ_STATE_M_DETECTED:
+			case OBJ_STATE_M_DETECTED_C:
 				if(noOfCircle == 0)
 				{
 					state = OBJ_STATE_NONE;
@@ -251,15 +253,14 @@ class BallDetector:public Thread
 				}else if(noOfCircle == 1)
 				{
 					state = OBJ_STATE_DETECTED;
-					//store RCircle
-					CaptureImage::setRCircle(rcircle);
 					count = 0;
+					objectState(noOfCircle,rcircle);
 				}
 				else
 				{
-					if(count > 5)
+					if(count > 2)
 					{
-						//store Multiple object 	
+						state = OBJ_STATE_M_DETECTED_C;
 					}
 					else
 						count++;
@@ -267,20 +268,21 @@ class BallDetector:public Thread
 
 				break;
 			case OBJ_STATE_NONE:
+			case OBJ_STATE_NONE_C:
 
 				if(noOfCircle == 0)
 				{
 					if(count > 5)
 					{
-						//STORE NONE
+						state = OBJ_STATE_NONE_C;
 					}
 					else
 						count++;
 				}else if(noOfCircle == 1)
 				{
 					state = OBJ_STATE_DETECTED;
-					//store RCircle
 					count = 0;
+					objectState(noOfCircle,rcircle);
 				}
 				else
 				{
@@ -331,23 +333,24 @@ public:
 			switch(state)
 			{
 				case OBJ_STATE_INIT:
-				case OBJ_STATE_NONE:
+				case OBJ_STATE_NONE_C:
 					msg.header.type = DTD_OBJ_NOBALL;
 					socket.send((unsigned char *)&msg,sizeof(MSG_Circle));
 
 					break;
 				case OBJ_STATE_DETECTED: 
+				case OBJ_STATE_M_DETECTED:
+				case OBJ_STATE_NONE:
 					msg.header.type = DTD_OBJ_BALL;
 					
 					CaptureImage::getRCircle(msg.rCircle);
 					socket.send((unsigned char *)&msg,sizeof(MSG_Circle));
 
 					break;
-				case OBJ_STATE_M_DETECTED:
+				case OBJ_STATE_M_DETECTED_C:
 					msg.header.type = DTD_OBJ_M_BALL;
 					socket.send((unsigned char *)&msg,sizeof(MSG_Circle));	
 					break;
-
 			}
 		}
 	}
