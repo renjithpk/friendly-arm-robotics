@@ -9,7 +9,7 @@
 #define STATEMACHINE_H_
 #include "cvInterface.h"
 #include "engine.h"
-
+#include "rtimer.h"
 
 class State;
 
@@ -80,7 +80,7 @@ public:
 };
 
 
-class RoboInit: public State
+class RoboInit: public State//, public RTimer
 {
 public:
 	RoboInit(Context &ctxt);//:State(ctxt) {}

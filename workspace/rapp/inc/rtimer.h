@@ -11,10 +11,14 @@
 class RTimer: public EpollIf 
 {
 	int fd;
+	bool isValidFd;
 public:
+	RTimer();
 	int setDelay(const unsigned long &delayms);
 
 	int setDelayRep(const unsigned long &delayms);
+	int stopTimer();
+	//overrride this function and setDelay
 	virtual void onTimerExpired() = 0;
 
 private:

@@ -68,6 +68,20 @@ App::App(int argc, char * argv[]):argc(argc),argv(argv)
 		syslog(LOG_ERR,"missing server ip argument");
 	}
 }
+int App::reqRepObjDetet()
+{
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+	Header headern;
+	headern.type = RQ_REP_OBJ_DETECT;
+	socket.send((unsigned char *)&headern,sizeof(Header));
+}
+int App::stopRepObjDetet()
+{
+	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+	Header headern;
+	headern.type = CNCL_REP_OBJ_DETECT;
+	socket.send((unsigned char *)&headern,sizeof(Header));	
+}
 int App::requestObj()
 {
 	syslog(LOG_DEBUG, "%s ENTRY",__func__);

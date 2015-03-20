@@ -1,5 +1,8 @@
 #include <rtimer.h>
 
+RTimer::RTimer():isValidFd(false)
+{	
+}
 
 int RTimer::setDelay(const unsigned long &delayms)
 {
@@ -27,7 +30,10 @@ int RTimer::initialize(struct itimerspec &new_value)
 
 	/* Create a CLOCK_REALTIME absolute timer with initial
 	   expiration and interval as specified in command line */
-
+	if(isValidFd)
+	{
+		close(fd);	
+	}
 	fd = timerfd_create(CLOCK_REALTIME, 0);
 	if (fd == -1)
 	{
@@ -40,7 +46,7 @@ int RTimer::initialize(struct itimerspec &new_value)
 		//	handle_error("timerfd_settime");
 		return -1;
 	}
-
+	isValidFd = true;
 	EpollIf::initialize(fd);
 	Epoll::getInstance()->addFd(this);
 	return 0;
@@ -58,9 +64,19 @@ void RTimer::epoll_cb()
 	}
 	onTimerExpired();
 }
-
+int RTimer::stopTimer()
+{
+	if(isValidFd)
+	{
+		::close(fd);	
+	}
+	isValidFd = false;
+}
 
 RTimer::~RTimer()
 {
-	::close(fd);	
+	if(isValidFd)
+	{
+		::close(fd);	
+	}
 }
