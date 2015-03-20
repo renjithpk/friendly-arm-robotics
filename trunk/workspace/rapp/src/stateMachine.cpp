@@ -16,6 +16,17 @@ Context::Context()
 	setCurrentState(new RoboInit(*this));
 }
 
+void Context::startTracking()
+{	
+	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
+	app_gp->reqRepObjDetet();
+
+	Engine * engine = Engine::getInstance();
+	engine->SetDirection(true);
+	engine->SetSpeed(40);
+		engine->MoveRight(200);
+
+}
 //CONTEXT
 void Context::setCurrentState(State *stPtr)
 {
@@ -65,11 +76,6 @@ int Context::handleBallDetected(EMessageT oType,RCircle & rCircle)
 	}
 }
 //CONTEXT
-void Context::startTracking()
-{	
-	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
-	app_gp->requestObj();//TODO change name 
-}
 bool lastStateRight = true; 
 //CONTEXT
 int Context::getError(RCircle &data)
@@ -180,6 +186,7 @@ RoboInit::~RoboInit()
 int RoboInit::handleBallNotFound(int count)
 {
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
+	/*
 	Engine * engine = Engine::getInstance();
 	engine->SetDirection(true);
 	engine->SetSpeed(40);
@@ -201,9 +208,11 @@ int RoboInit::handleBallNotFound(int count)
 	//engine->MoveRight(0);
 	app_gp->requestObj();
 	sleep(1);
+	*/
 }
 int RoboInit::handleBallOnRight(RCircle &rCircle,int err)
 {
+	/*
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
 	app_gp->requestObj();
 	Engine * engine = Engine::getInstance();
@@ -213,9 +222,15 @@ int RoboInit::handleBallOnRight(RCircle &rCircle,int err)
 	//sleep(1);
 	engine->SetSpeed(0);
 	context.setCurrentState(new BallOnRight(context));
+	*/
+	Engine * engine = Engine::getInstance();
+	engine->SetDirection(true);
+	engine->SetSpeed(0);
+	app_gp->stopRepObjDetet();
 }
 int RoboInit::handleBallOnLeft(RCircle &rCircle,int err)
 {
+	/*
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
 	app_gp->requestObj();
 	Engine * engine = Engine::getInstance();
@@ -225,9 +240,15 @@ int RoboInit::handleBallOnLeft(RCircle &rCircle,int err)
 	//sleep(1);
 	engine->SetSpeed(0);
 	context.setCurrentState(new BallOnLeft(context));
+	*/
+	Engine * engine = Engine::getInstance();
+	engine->SetDirection(true);
+	engine->SetSpeed(0);
+	app_gp->stopRepObjDetet();
 }
 int RoboInit::handleBallOnCenter(RCircle &rCircle,int err)
 {
+	/*
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
 	Engine * engine = Engine::getInstance();
 	engine->SetDirection(true);
@@ -237,9 +258,15 @@ int RoboInit::handleBallOnCenter(RCircle &rCircle,int err)
 	engine->SetSpeed(0);
 	context.setCurrentState(new BallLocked(context));
 	app_gp->requestObj();
+	*/
+	Engine * engine = Engine::getInstance();
+	engine->SetDirection(true);
+	engine->SetSpeed(0);
+	app_gp->stopRepObjDetet();
 }
 int RoboInit::handleMultipleBall()
 {
+	/*
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
 	Engine * engine = Engine::getInstance();
 	engine->SetDirection(false);
@@ -248,6 +275,11 @@ int RoboInit::handleMultipleBall()
 	engine->SetDirection(true);
 	engine->SetSpeed(0);
 	app_gp->requestObj();
+	*/
+	Engine * engine = Engine::getInstance();
+	engine->SetDirection(true);
+	engine->SetSpeed(0);
+	app_gp->stopRepObjDetet();
 }
 /////////////////////// BALL ON RIGHT ///////////////////////
 

@@ -1,6 +1,7 @@
 #include "types.h"
 #include "thread.h"
 #include "tcpsocket.h"
+#include "rtimer.h"
 #include "cvInterface.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -10,18 +11,7 @@
 #include <X11/Xlib.h> 
 using namespace std;
 
-string ip_addr="";// = argv[1];
-
-//pthread_mutex_t gui_mtx = PTHREAD_MUTEX_INITIALIZER;
-
-void tSwaitKey(int time)
-{
-//	if(0 == pthread_mutex_trylock(&gui_mtx))
-//	{
-		waitKey(time);
-//		pthread_mutex_unlock(&gui_mtx);
-//	}
-}
+string ip_addr="";
 
 //Mat streamImg;
 pthread_mutex_t img_mtx = PTHREAD_MUTEX_INITIALIZER;
@@ -111,18 +101,6 @@ class CaptureImage:public Thread
 			pthread_mutex_unlock(&img_mtx);
 
 		}
-		static void getRCircle(RCircle & rcircle)
-		{
-			pthread_mutex_lock(&circle_mtx);
-			rcircle = rCircle;	
-			pthread_mutex_unlock(&circle_mtx);
-		}
-		static void setRCircle(const RCircle & rcircle)
-		{
-			pthread_mutex_lock(&circle_mtx);
-			rCircle =rcircle;	
-			pthread_mutex_unlock(&circle_mtx);
-		}
 };
 
 RCircle CaptureImage::rCircle;//x; y;r; maxx; maxy;count;
@@ -151,34 +129,46 @@ int compare(int value,int ref, int err)
 	return 0;
 }
 
-class BallDetector:public Thread
+class BallDetector:public RTimer
 {
 	public:
+	BallDetector(Socket & socket):socket_p(&socket)
+	{}
+
+	BallDetector()
+	{}
+
 	cvIf cv;
-
-	void Execute(void*)
+	RCircle trCircle;
+	std::stringstream sstm;
+	MSG_Circle rspMsg;
+	Socket *socket_p;
+	
+	int startRepeatedDetect(Socket &socket)
 	{
-		//pthread_mutex_lock(&gui_mtx);
-		cv.createBallTracker();
-		//pthread_mutex_unlock(&gui_mtx);
-
-		//waitKey(50);
-		while(1)
-		{
-			//sleep(1);
-			int count = detectBall();
-			//waitKey(50);
-			//cout<<"."<<flush;
-		}
+		socket_p =&socket;
+		setDelayRep(1);	
 	}
 
+	void onTimerExpired()
+	{
+		if(detectBall() > 0)
+		{
+			cout<<"."<<flush;
+			rspMsg.header.type = DTD_OBJ_BALL;
+			rspMsg.rCircle =  trCircle;
+			socket_p->send((unsigned char *)&rspMsg,sizeof(MSG_Circle));
+		}
+	}
+	int stopRepeatDetect()
+	{
+		stopTimer();	
+	}
 	int detectBall()
 	{
 		int countBall = 0;
-		static RCircle trCircle;
 		vector<Vec3f> circles;
 		Mat copiedImg;
-		static std::stringstream sstm;
 		CaptureImage::readImage(copiedImg);
 		countBall = cv.detectBall(circles,copiedImg);
 		
@@ -187,125 +177,33 @@ class BallDetector:public Thread
 		{
 			sstm.str("");
 			copyRCircle(trCircle, circles[0]);
-			objectState(countBall,trCircle);
 			sstm<<image_size.width<<"x"<<image_size.height<<"   [x : y : r] ["<<trCircle.x<<" : "<<
 				trCircle.y<<" : "<<trCircle.r<<"]    "<<(int)state<<" nz "<<nonZeros;
 			
-			//pthread_mutex_lock(&gui_mtx);
 			cv.displayImgWithCircle(copiedImg,circles,sstm.str());
-			//pthread_mutex_unlock(&gui_mtx);
 		}
 		else
 		{
-			objectState(countBall);
-			//pthread_mutex_lock(&gui_mtx);
 			sstm<<image_size.width<<"x"<<image_size.height<<"   [x : y : r] ["<<trCircle.x<<" : "<<
 				trCircle.y<<" : "<<trCircle.r<<"]    "<<(int)state<<" nz "<<nonZeros;
 			cv.displayImgage(copiedImg,sstm.str());
-			//pthread_mutex_unlock(&gui_mtx);
 		}
 		return countBall;
 	}
 
 
-	void objectState(int noOfCircle, RCircle rcircle = 0)
-	{
-		static int count = 0;
-		switch(state)
-		{
-			case OBJ_STATE_INIT:
-				if(noOfCircle == 0)
-				{
-					state = OBJ_STATE_NONE;
-				}else if(noOfCircle == 1)
-				{
-					state = OBJ_STATE_DETECTED;
-					objectState(noOfCircle,rcircle);
-				}
-				else
-				{
-					state = OBJ_STATE_M_DETECTED;	
-				}
-				break;
-			case OBJ_STATE_DETECTED:
-				if(noOfCircle == 0)
-				{
-					state = OBJ_STATE_NONE;
-					count = 0;
-				}else if(noOfCircle == 1)
-				{
-					//store RCircle
-					CaptureImage::setRCircle(rcircle);
-					count = 0;
-				}
-				else
-				{
-					state = OBJ_STATE_M_DETECTED;
-					count = 0;
-				}
-			break;
-			case OBJ_STATE_M_DETECTED:
-			case OBJ_STATE_M_DETECTED_C:
-				if(noOfCircle == 0)
-				{
-					state = OBJ_STATE_NONE;
-					count = 0;
-				}else if(noOfCircle == 1)
-				{
-					state = OBJ_STATE_DETECTED;
-					count = 0;
-					objectState(noOfCircle,rcircle);
-				}
-				else
-				{
-					if(count > 2)
-					{
-						state = OBJ_STATE_M_DETECTED_C;
-					}
-					else
-						count++;
-				}
-
-				break;
-			case OBJ_STATE_NONE:
-			case OBJ_STATE_NONE_C:
-
-				if(noOfCircle == 0)
-				{
-					if(count > 5)
-					{
-						state = OBJ_STATE_NONE_C;
-					}
-					else
-						count++;
-				}else if(noOfCircle == 1)
-				{
-					state = OBJ_STATE_DETECTED;
-					count = 0;
-					objectState(noOfCircle,rcircle);
-				}
-				else
-				{
-					state = OBJ_STATE_M_DETECTED;
-					count = 0;
-				}			
-				break;
-		}	
-	}
-
 };
 
-class MyApp:public SocketIf
+class MyApp:public SocketIf 
 {
 public:
 	Socket socket;
+	BallDetector bd;
 
 	int startme(void)
 	{
 		CaptureImage cimage;
 		cimage.Start();
-		BallDetector bd;
-		bd.Start();
 		socket.registerInterface(this);
 		if(-1 == socket.initServer(5000)) return -1;
 		
@@ -325,33 +223,31 @@ public:
 	{
 		cout<<"rserver socket data received"<<endl;
 
-		Header *header_c = (Header *)buffer;
-		if(header_c->type == RQ_OBJ_DETECT)
-		{	
-			cout<<"Request for face detection"<<endl;
-			MSG_Circle msg;
-			switch(state)
-			{
-				case OBJ_STATE_INIT:
-				case OBJ_STATE_NONE_C:
-					msg.header.type = DTD_OBJ_NOBALL;
-					socket.send((unsigned char *)&msg,sizeof(MSG_Circle));
+		Header *header_c = (Header *)buffer;	
 
-					break;
-				case OBJ_STATE_DETECTED: 
-				case OBJ_STATE_M_DETECTED:
-				case OBJ_STATE_NONE:
-					msg.header.type = DTD_OBJ_BALL;
-					
-					CaptureImage::getRCircle(msg.rCircle);
-					socket.send((unsigned char *)&msg,sizeof(MSG_Circle));
+		switch(header_c->type)
+		{
+			case RQ_OBJ_DETECT:
+			break;
+			case RQ_REP_OBJ_DETECT:
+				{	
+					cout<<"Request for face detection"<<endl;
+					/*if(NULL == bd_p)
+					{
+						bd_p= new BallDetector;
+					}*/
+					/*if(NULL != bd_p)*/ bd.startRepeatedDetect(socket);
+				}
+				break;
 
-					break;
-				case OBJ_STATE_M_DETECTED_C:
-					msg.header.type = DTD_OBJ_M_BALL;
-					socket.send((unsigned char *)&msg,sizeof(MSG_Circle));	
-					break;
-			}
+			case CNCL_REP_OBJ_DETECT:
+				{	
+					//delete bd_p;
+					//bd_p = NULL;
+					bd.stopRepeatDetect();
+				}
+				break;
+
 		}
 	}
 
@@ -365,33 +261,6 @@ public:
 		}	
 		cout<< "client connected"<<endl;
 	}
-
-
-
-#if 0
-    int detectFace(Rect_<int> &rect)
-	{
-		int ret = 0;
-		vector< Rect_<int> > faces;
-		Mat img;
-		cv.getCapture()>> img;
-		int nos = cv.detectFace(img,faces);
-		if(nos > 0)
-		{
-			ret = 1;
-			rect = faces[0];
-			cv.displayImageWithRect(img,rect);
-		
-		}else
-		{
-			cv.displayImageWithRect(img);
-		}
-
-		waitKey(50);	
-		return ret;
-	}
-#endif
-
 };
 
 

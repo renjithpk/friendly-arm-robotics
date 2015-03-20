@@ -43,6 +43,8 @@ class App :public SocketIf, public KeyIf
 	App();
 	App(int argc, char * argv[]);
 	int requestObj();
+	int reqRepObjDetet();
+	int stopRepObjDetet();
 	int initService(void);
 	int onDataReceived(unsigned char * buffer, int size);
 	void Register(AppIf * appif);

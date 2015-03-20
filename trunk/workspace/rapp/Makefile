@@ -26,10 +26,10 @@ HOST_OBJ_DIR = ./obj_h
 CC_HOST=g++
 CFLAGS_HOST=-I./inc
 
-_DEPS_H = thread.h types.h epoll.h tcpsocket.h 
+_DEPS_H = thread.h types.h epoll.h tcpsocket.h rtimer.h 
 DEPS_H = $(patsubst %,$(INC_DIR)/%,$(_DEPS_H))
 
-_OBJ_H = rserver.o cvInterface.o thread.o epoll.o tcpsocket.o  terminal.o
+_OBJ_H = rserver.o cvInterface.o thread.o epoll.o tcpsocket.o  terminal.o rtimer.o
 OBJ_H = $(patsubst %,$(HOST_OBJ_DIR)/%,$(_OBJ_H))
 
 $(HOST_OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPS_H)
