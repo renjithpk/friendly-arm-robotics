@@ -18,6 +18,7 @@ class Context
 {
 	public:
 	Context();
+	RCircle rCircle;
 	State*  cState;
 	void setCurrentState(State *stPtr);
 	int handleBallDetected(EMessageT oType, RCircle &rCircle);
@@ -41,6 +42,8 @@ public:
 	virtual int handleBallOnCenter(RCircle &rCircle,int err);
 	virtual int handleBallNotFound(int count = -1);
 	virtual int handleMultipleBall();
+	virtual int handleInit();
+
 };
 
 class BallLocked: public State
@@ -80,8 +83,20 @@ public:
 };
 
 
-class RoboInit: public State//, public RTimer
+class RoboInit: public State,public RTimer
 {
+	enum ESubState
+	{
+		ERotateL,
+		ERotateH,
+		EVerify,
+		EVerifyTB,
+		EStop
+	};
+	bool isTurnedBack;
+	bool isRequestSendToconfirm;
+	ESubState sstate;
+	bool confirmObject();
 public:
 	RoboInit(Context &ctxt);//:State(ctxt) {}
 	virtual ~RoboInit();
@@ -90,6 +105,9 @@ public:
 	int handleBallOnCenter(RCircle &rCircle,int err);
 	int handleBallNotFound(int count);
 	int handleMultipleBall();
+	void onTimerExpired();
+	int handleInit();
+
 };
 
 #endif /* STATEMACHINE_H_ */

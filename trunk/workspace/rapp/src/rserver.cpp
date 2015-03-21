@@ -36,9 +36,11 @@ static Enum_ObjState state = OBJ_STATE_INIT;
 
 void copyRCircle(RCircle & c,Vec3f circleVec)
 {
-			c.x = cvRound(circleVec[0]);
-			c.y = cvRound(circleVec[1]);
-			c.r = cvRound(circleVec[2]);
+	//   640x480 
+
+	c.x = cvRound(circleVec[0]) * 100/640;
+	c.y = cvRound(circleVec[1]) * 100/640;
+	c.r = cvRound(circleVec[2]) * 100/640;
 }
 
 class CaptureImage:public Thread
@@ -136,18 +138,22 @@ class BallDetector:public RTimer
 	{}
 
 	BallDetector()
-	{}
+	{
+	}
 
 	cvIf cv;
 	RCircle trCircle;
 	std::stringstream sstm;
 	MSG_Circle rspMsg;
 	Socket *socket_p;
-	
+	int createBallTracker()
+	{
+		return cv.createBallTracker();	
+	}
 	int startRepeatedDetect(Socket &socket)
 	{
 		socket_p =&socket;
-		setDelayRep(1);	
+		setDelay(1);	
 	}
 
 	void onTimerExpired()
@@ -159,6 +165,7 @@ class BallDetector:public RTimer
 			rspMsg.rCircle =  trCircle;
 			socket_p->send((unsigned char *)&rspMsg,sizeof(MSG_Circle));
 		}
+		setDelay(1);
 	}
 	int stopRepeatDetect()
 	{
@@ -214,7 +221,9 @@ public:
 			return -1;
 		}
 
+		cout<< "client connected"<<endl;
 		
+		bd.createBallTracker();	
 		Epoll::getInstance()->run();
 		cout<<"client connected"<<endl;
 	}
@@ -222,32 +231,58 @@ public:
 	int onDataReceived(unsigned char * buffer, int size)
 	{
 		cout<<"rserver socket data received"<<endl;
-
-		Header *header_c = (Header *)buffer;	
+		if(size < sizeof(Header))
+		{
+			cout<<"Invalid size"<<endl;
+				
+		}
+		const Header *header_c = (Header *)buffer;	
 
 		switch(header_c->type)
 		{
 			case RQ_OBJ_DETECT:
-			break;
+				{
+					bd.stopRepeatDetect();
+					MSG_Circle rspMsg;
+					if( bd.detectBall() > 0)
+					{
+						cout<<"."<<flush;
+						rspMsg.header.type = DTD_OBJ_BALL;
+						rspMsg.rCircle =  bd.trCircle;
+						socket.send((unsigned char *)&rspMsg,sizeof(MSG_Circle));
+					}
+					else
+					{
+						rspMsg.header.type = DTD_OBJ_NOBALL;
+						socket.send((unsigned char *)&rspMsg,sizeof(MSG_Circle));
+					}
+					break;
+				}
 			case RQ_REP_OBJ_DETECT:
 				{	
-					cout<<"Request for face detection"<<endl;
+					cout<<"Request for repeated face detection"<<endl;
 					/*if(NULL == bd_p)
 					{
 						bd_p= new BallDetector;
 					}*/
-					/*if(NULL != bd_p)*/ bd.startRepeatedDetect(socket);
+					/*if(NULL != bd_p)*/ 
+					bd.startRepeatedDetect(socket);
+					break;
 				}
-				break;
 
 			case CNCL_REP_OBJ_DETECT:
 				{	
 					//delete bd_p;
 					//bd_p = NULL;
 					bd.stopRepeatDetect();
+					break;
 				}
-				break;
 
+		}
+		if(header_c->size < size)
+		{
+			cout<<"size greater than header size"<<endl;
+			onDataReceived(buffer + header_c->size, size - header_c->size);
 		}
 	}
 

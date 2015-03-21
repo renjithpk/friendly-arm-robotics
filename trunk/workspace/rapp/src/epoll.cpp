@@ -57,7 +57,7 @@ int Epoll::addFd(EpollIf *intEpoll)
 	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	intList[intEpoll->fd_m] = intEpoll;
 	int res = epoll_ctl(epfd, EPOLL_CTL_ADD,intEpoll->fd_m , &intEpoll->ev);
-	syslog(LOG_INFO,"epoll fd added res %d epfd %d",res,epfd);
+	syslog(LOG_DEBUG,"epoll fd added res %d epfd %d",res,epfd);
 }
 
 int Epoll::run()

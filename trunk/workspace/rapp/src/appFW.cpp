@@ -2,6 +2,7 @@
 #include "terminal.h"
 #include "stdlib.h"
 #include "appFW.h"
+#include "engine.h"
 void Key::init(KeyIf *keyIf)
 {
 	syslog(LOG_DEBUG, "%s ENTRY",__func__);
@@ -73,6 +74,7 @@ int App::reqRepObjDetet()
 	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	Header headern;
 	headern.type = RQ_REP_OBJ_DETECT;
+	headern.size = sizeof(Header);
 	socket.send((unsigned char *)&headern,sizeof(Header));
 }
 int App::stopRepObjDetet()
@@ -80,6 +82,7 @@ int App::stopRepObjDetet()
 	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	Header headern;
 	headern.type = CNCL_REP_OBJ_DETECT;
+	headern.size = sizeof(Header);
 	socket.send((unsigned char *)&headern,sizeof(Header));	
 }
 int App::requestObj()
@@ -87,6 +90,7 @@ int App::requestObj()
 	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 	Header headern;
 	headern.type = RQ_OBJ_DETECT;
+	headern.size = sizeof(Header);
 	socket.send((unsigned char *)&headern,sizeof(Header));
 }
 int App::initService(void)
@@ -175,9 +179,14 @@ void App::onKeyPressed(char key)
 
 void App::exit()
 {
-	Terminal::resetTermios();	
 
 	//TODO all other cleanup
-
+    Engine * engine = Engine::getInstance();
+	engine->SetSpeed(0);
+	printf("wait for a moment...\n");
+	sleep(1);
+	//TODO kill all threads
+	Terminal::resetTermios();	
+	Terminal::resetTermios();	
 	::exit(0);
 }

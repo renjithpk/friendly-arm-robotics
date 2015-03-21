@@ -16,16 +16,13 @@ Context::Context()
 	setCurrentState(new RoboInit(*this));
 }
 
+//CONTEXT
+bool lastStateRight = true; 
+bool movingRight = false;
 void Context::startTracking()
 {	
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
-	app_gp->reqRepObjDetet();
-
-	Engine * engine = Engine::getInstance();
-	engine->SetDirection(true);
-	engine->SetSpeed(40);
-		engine->MoveRight(200);
-
+	cState->handleInit();
 }
 //CONTEXT
 void Context::setCurrentState(State *stPtr)
@@ -34,10 +31,6 @@ void Context::setCurrentState(State *stPtr)
 	cState = stPtr;
 }
 
-// DTD_OBJ_FACE,
-// DTD_OBJ_NOBALL,
-// DTD_OBJ_BALL,
-// DTD_OBJ_M_BALL
 
 //CONTEXT
 int Context::handleBallNone(EMessageT oType,int count)
@@ -51,7 +44,6 @@ int Context::handleBallNone(EMessageT oType,int count)
 	{
 		cState->handleBallNotFound();
 	}
-	//handleBallNotFound(count);
 }
 
 
@@ -60,6 +52,7 @@ int Context::handleBallNone(EMessageT oType,int count)
 int Context::handleBallDetected(EMessageT oType,RCircle & rCircle)
 {
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
+	this->rCircle = rCircle;
 	int err = getError(rCircle );
 	syslog(LOG_INFO,"Err: %d",err);
 	if(err >0)
@@ -76,8 +69,6 @@ int Context::handleBallDetected(EMessageT oType,RCircle & rCircle)
 	}
 }
 //CONTEXT
-bool lastStateRight = true; 
-//CONTEXT
 int Context::getError(RCircle &data)
 {
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
@@ -88,8 +79,8 @@ int Context::getError(RCircle &data)
 	//0     220   370  640
 
 	//if(data.x < 370 && data.x > 220)
-	const int xmax = 640;
-	const int offset = 50;	
+	const int xmax = 100;
+	const int offset = 10;	
 	int lowerLimit = ((xmax/2) - offset) - data.r;
 	int upperLimit = ((xmax/2) + offset) + data.r;
 
@@ -99,47 +90,13 @@ int Context::getError(RCircle &data)
 	}
 	else if(data.x > upperLimit)
 	{
-		return 1;
+		return data.x - upperLimit;
 	}
-	return -1;
+	return data.x - lowerLimit;
 
 }
 
 
-//CONTEXT
-void Context::rotate(char dir)
-{
-	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
-	Engine * engine_p = Engine::getInstance();
-	engine_p->SetSpeed(20);
-	if(dir == 'R') engine_p->MoveRight(200);
-	else if(dir == 'L') engine_p->MoveLeft(200);
-	else syslog(LOG_ERR,"Invalid direction : %c ",dir);	
-}
-
-//CONTEXT
-void  Context::moveRight()
-{
-	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
-	Engine * engine_p = Engine::getInstance();
-	engine_p->SetSpeed(20);
-	engine_p->MoveRight(200);
-	sleep(1);
-	engine_p->SetSpeed(0);
-	sleep(1);
-}
-
-//CONTEXT
-void  Context::moveLeft()
-{
-	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
-	Engine * engine_p = Engine::getInstance();
-	engine_p->SetSpeed(20);
-	engine_p->MoveLeft(200);
-	sleep(1);
-	engine_p->SetSpeed(0);
-	sleep(1);
-}
 
 /////////////////////// STATE ///////////////////////
 //STATE
@@ -149,11 +106,6 @@ State::State(Context &ctxt):context(ctxt)
 State::~State()
 {
 }
-/*
-int State::handleBallDetected(RCircle & rCircle)
-{
-	syslog(LOG_INFO, "State::%s ENTRY",__func__);
-}*/
 int State::handleBallNotFound(int count)
 {
 	syslog(LOG_INFO, "State::%s ENTRY",__func__);
@@ -174,112 +126,138 @@ int State::handleMultipleBall()
 {
 	syslog(LOG_INFO, "State::%s ENTRY",__func__);	
 }
+int State::handleInit()
+{
+	syslog(LOG_INFO, "State::%s ENTRY",__func__);	
+}
 ///////////////////////  ROBO INIT ///////////////////////
 
-RoboInit::RoboInit(Context &ctxt):State(ctxt)
+RoboInit::RoboInit(Context &ctxt):State(ctxt),isTurnedBack(false)
 {
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
+    isRequestSendToconfirm = false;
 }
 RoboInit::~RoboInit()
 {
+	syslog(LOG_INFO, "State::%s ENTRY",__func__);	
+	sstate = EStop;
 }
+
+int RoboInit::handleInit()
+{
+	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
+	app_gp->reqRepObjDetet();
+	sstate = ERotateH;
+	setDelay(1);
+}
+
+void RoboInit::onTimerExpired()
+{
+	syslog(LOG_INFO, "RoboInit::%s ENTRY, sstate [%d]  ",__func__,(int)sstate);
+	Engine * engine = Engine::getInstance();
+	switch(sstate)
+	{
+		case ERotateL: //0
+		engine->SetSpeed(100);
+		engine->MoveLeft(200);
+		setDelay(200);
+		sstate = ERotateH;
+	    break;
+		
+		case ERotateH: //1
+		engine->SetSpeed(20);
+		engine->MoveLeft(200);
+		setDelay(800);
+		sstate = ERotateL;
+		break;
+		
+		case EVerify: //2
+		engine->SetDirection(true);
+		engine->SetSpeed(0);
+	    break;
+		
+		case EVerifyTB: //3
+		handleInit();	
+		break;
+		case EStop: //4
+		break;
+	}
+}
+
 int RoboInit::handleBallNotFound(int count)
 {
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
-	/*
 	Engine * engine = Engine::getInstance();
-	engine->SetDirection(true);
-	engine->SetSpeed(40);
-	if(lastStateRight)
-	{
-		engine->MoveRight(200);
-	}//sleep(1);
-	else
-	{
-		engine->MoveLeft(200);
+	if(sstate == EVerify)
+	{	
+		//turn back;
+		engine->SetSpeed(20);
+		engine->MoveRight(100);
+		setDelay(300);
+		sstate = EVerifyTB;//turning back
 	}
-	struct timespec tim, tim2;
-   	tim.tv_sec = 0;
-   	tim.tv_nsec = 600000000L;
-	nanosleep(&tim , &tim2);
-	engine->SetSpeed(20);
-   	tim.tv_nsec = 600000000L;
-	nanosleep(&tim , &tim2);
-	//engine->MoveRight(0);
-	app_gp->requestObj();
-	sleep(1);
-	*/
+}
+bool RoboInit::confirmObject()
+{
+	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
+	bool ret = false;
+	Engine * engine = Engine::getInstance();
+	switch(sstate)
+	{
+		case ERotateL:
+		case ERotateH:
+			{
+				syslog(LOG_INFO, "confirm object found");
+				engine->SetSpeed(0);
+				app_gp->requestObj();
+				sstate = EVerify;
+				break;
+			}
+		case EVerifyTB:
+		case EVerify:
+			{
+				syslog(LOG_INFO, "confirmed");
+				ret = true;
+				break;
+			}
+	}
+	return ret;
 }
 int RoboInit::handleBallOnRight(RCircle &rCircle,int err)
 {
-	/*
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
-	app_gp->requestObj();
-	Engine * engine = Engine::getInstance();
-	engine->SetDirection(true);
-	//engine->SetSpeed(20);
-	//engine->MoveLeft(200);
-	//sleep(1);
-	engine->SetSpeed(0);
-	context.setCurrentState(new BallOnRight(context));
-	*/
-	Engine * engine = Engine::getInstance();
-	engine->SetDirection(true);
-	engine->SetSpeed(0);
-	app_gp->stopRepObjDetet();
+	if(confirmObject())
+	{
+		context.setCurrentState(new BallOnRight(context));
+		app_gp->reqRepObjDetet();
+	}
 }
 int RoboInit::handleBallOnLeft(RCircle &rCircle,int err)
 {
-	/*
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
-	app_gp->requestObj();
-	Engine * engine = Engine::getInstance();
-	engine->SetDirection(true);
-	//engine->SetSpeed(20);
-	//engine->MoveLeft(200);
-	//sleep(1);
-	engine->SetSpeed(0);
-	context.setCurrentState(new BallOnLeft(context));
-	*/
-	Engine * engine = Engine::getInstance();
-	engine->SetDirection(true);
-	engine->SetSpeed(0);
-	app_gp->stopRepObjDetet();
+	if(confirmObject())
+	{
+		context.setCurrentState(new BallOnLeft(context));
+		app_gp->reqRepObjDetet();
+	}
 }
 int RoboInit::handleBallOnCenter(RCircle &rCircle,int err)
 {
-	/*
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
-	Engine * engine = Engine::getInstance();
-	engine->SetDirection(true);
-	engine->SetSpeed(20);
-	engine->MoveLeft(200);
-	sleep(1);
-	engine->SetSpeed(0);
-	context.setCurrentState(new BallLocked(context));
-	app_gp->requestObj();
-	*/
-	Engine * engine = Engine::getInstance();
-	engine->SetDirection(true);
-	engine->SetSpeed(0);
-	app_gp->stopRepObjDetet();
+	if(confirmObject())
+	{
+		context.setCurrentState(new BallLocked(context));
+		app_gp->reqRepObjDetet();
+	}
 }
 int RoboInit::handleMultipleBall()
 {
-	/*
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
-	Engine * engine = Engine::getInstance();
-	engine->SetDirection(false);
-	engine->SetSpeed(30);
-	sleep(1);
-	engine->SetDirection(true);
-	engine->SetSpeed(0);
-	app_gp->requestObj();
-	*/
-	Engine * engine = Engine::getInstance();
-	engine->SetDirection(true);
-	engine->SetSpeed(0);
-	app_gp->stopRepObjDetet();
+	if(confirmObject())
+	{
+		context.setCurrentState(new BallOnRight(context));
+		app_gp->reqRepObjDetet();
+	}
 }
 /////////////////////// BALL ON RIGHT ///////////////////////
 
@@ -287,57 +265,44 @@ BallOnRight::BallOnRight(Context &ctxt):State(ctxt)
 {
 	syslog(LOG_INFO, "%s ENTRY",__func__);
 	lastStateRight = true;
+	Engine * engine_p = Engine::getInstance();
+	engine_p->SetSpeed(100);
+	engine_p->MoveRight(70);
 }
 
 BallOnRight::~BallOnRight()
 {
 }
+
 int BallOnRight::handleBallNotFound(int count)
 {
 	syslog(LOG_INFO, "BallOnRight::%s ENTRY",__func__);
-	//context.rotate('R');
-	//sleep(1);
+	Engine * engine_p = Engine::getInstance();
 	context.setCurrentState(new RoboInit(context));
-	app_gp->requestObj();
-
+	engine_p->SetSpeed(0);
 }
+
 int BallOnRight::handleBallOnRight(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "BallOnRight::%s ENTRY",__func__);
-//	context.moveRight();	
-	Engine * engine_p = Engine::getInstance();
-	engine_p->SetSpeed(60);
-	engine_p->MoveRight(70);
-	app_gp->requestObj();
 }
+
 int BallOnRight::handleBallOnLeft(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "BallOnRight::%s ENTRY",__func__);
-	//context.moveLeft();	
-	Engine * engine_p = Engine::getInstance();
-	engine_p->SetSpeed(60);
-	engine_p->MoveLeft(70);
 	context.setCurrentState(new BallOnLeft(context));
-	app_gp->requestObj();
 }
+
 int BallOnRight::handleBallOnCenter(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "BallOnRight::%s ENTRY",__func__);
 	context.setCurrentState(new BallLocked(context));
-	Engine * engine_p = Engine::getInstance();
-	engine_p->SetSpeed(0);
-	app_gp->requestObj();
 }
 int BallOnRight::handleMultipleBall()
 {
 	syslog(LOG_INFO, "BallOnRight::%s ENTRY",__func__);
 	Engine * engine = Engine::getInstance();
-	engine->SetDirection(false);
-	engine->SetSpeed(30);
-	sleep(1);
-	engine->SetDirection(true);
 	engine->SetSpeed(0);
-	app_gp->requestObj();
 }
 
 
@@ -347,6 +312,9 @@ BallOnLeft::BallOnLeft(Context &ctxt):State(ctxt)
 {
 	syslog(LOG_INFO, "BallOnLeft::%s ENTRY",__func__);
 	lastStateRight = false;
+	Engine * engine_p = Engine::getInstance();
+	engine_p->SetSpeed(100);
+	engine_p->MoveLeft(70);
 }
 BallOnLeft::~BallOnLeft()
 {
@@ -354,48 +322,29 @@ BallOnLeft::~BallOnLeft()
 int BallOnLeft::handleBallNotFound(int count)
 {
 	syslog(LOG_INFO, "BallOnLeft::%s ENTRY",__func__);
-	//context.rotate('L');
-	//sleep(1);
+	Engine * engine_p = Engine::getInstance();
 	context.setCurrentState(new RoboInit(context));
-	app_gp->requestObj();
+	engine_p->SetSpeed(0);
 }
 int BallOnLeft::handleBallOnRight(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "BallOnLeft::%s ENTRY",__func__);
-	//context.moveRight();	
-	Engine * engine_p = Engine::getInstance();
-	engine_p->SetSpeed(60);
-	engine_p->MoveRight(70);
 	context.setCurrentState(new BallOnRight(context));
-	app_gp->requestObj();
 }
 int BallOnLeft::handleBallOnLeft(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "BallOnLeft::%s ENTRY",__func__);
-	//context.moveLeft();	
-	Engine * engine_p = Engine::getInstance();
-	engine_p->SetSpeed(60);
-	engine_p->MoveLeft(70);
-	app_gp->requestObj();
 }
 int BallOnLeft::handleBallOnCenter(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "BallOnLeft::%s ENTRY",__func__);
 	context.setCurrentState(new BallLocked(context));
-	Engine * engine_p = Engine::getInstance();
-	engine_p->SetSpeed(0);
-	app_gp->requestObj();
 }
 int BallOnLeft::handleMultipleBall()
 {
 	syslog(LOG_INFO, "BallOnLeft::%s ENTRY",__func__);
 	Engine * engine = Engine::getInstance();
-	engine->SetDirection(false);
-	engine->SetSpeed(30);
-	sleep(1);
-	engine->SetDirection(true);
-	engine->SetSpeed(0);
-	app_gp->requestObj();
+    engine->SetSpeed(0);
 }
 
 //////////////////////// BALL LOCKED  ////////////////////////////
@@ -404,6 +353,16 @@ int BallOnLeft::handleMultipleBall()
 BallLocked::BallLocked(Context &ctxt):State(ctxt)
 {
 	syslog(LOG_INFO, "%s ENTRY",__func__);
+	Engine * engine = Engine::getInstance();
+	if(ctxt.rCircle.r > 130 )
+	{ 
+		syslog(LOG_INFO,"Reached Ball");
+		engine->SetSpeed(0);
+	}
+	else
+	{
+	    engine->SetSpeed(100);
+	}
 }
 BallLocked::~BallLocked()
 {
@@ -414,29 +373,21 @@ int BallLocked::handleBallNotFound(int count)
 {
 	syslog(LOG_INFO, "BallLocked::%s ENTRY",__func__);
 	Engine *engine = Engine::getInstance();
-	engine->SetDirection(false);
-	engine->SetSpeed(100);
-	sleep(1);
 	engine->SetSpeed(0);
-	//context.moveRight();	
-	//context.setCurrentState(new BallOnRight(context));	
-	context.setCurrentState(new RoboInit(context));
-	app_gp->requestObj();//TODO change name
 }
+
 int BallLocked::handleBallOnRight(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO,"BallLocked::%s ",__func__);
-	//context.moveRight();	
 	context.setCurrentState(new BallOnRight(context));
-	app_gp->requestObj();
 }
+
 int BallLocked::handleBallOnLeft(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO,"BallLocked::%s ",__func__);
-	//context.moveLeft();	
 	context.setCurrentState(new BallOnLeft(context));
-	app_gp->requestObj();
 }
+
 int BallLocked::handleBallOnCenter(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO,"BallLocked::%s ",__func__);
@@ -444,23 +395,14 @@ int BallLocked::handleBallOnCenter(RCircle &rCircle,int err)
 	engine->SetDirection(true);
 	if(rCircle.r > 130 )
 	{ 
-		syslog(LOG_INFO,"Go and hit ball");
-		engine->SetSpeed(100);
-		sleep(3);
+		syslog(LOG_INFO,"Reached Ball");
+		engine->SetSpeed(0);
 	}
-	engine->SetSpeed(60);
-	app_gp->requestObj();
 }
+
 int BallLocked::handleMultipleBall()
 {
 	syslog(LOG_INFO,"BallLocked::%s ",__func__);
 	Engine * engine = Engine::getInstance();
-	engine->SetDirection(false);
-	engine->SetSpeed(30);
-	sleep(1);
-	engine->SetDirection(true);
-	engine->SetSpeed(100);
-	sleep(1);
 	engine->SetSpeed(0);
-	app_gp->requestObj();
 }
