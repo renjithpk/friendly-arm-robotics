@@ -85,10 +85,6 @@ void wheel::Execute(void*)
 
 inline void wheel::turnOn()
 {
-	//port->setpin(isForward,pol1); //to optimize the above code
-	//port->setpin(!isForward,pol2);
-	//data = state ? (data | 1 << pinNumber) : (data & ~(1 << pinNumber));
-	//	setPort(data);
 
 	uint8_t data = port->readPort();
 	if(isForward)
@@ -107,17 +103,8 @@ inline void wheel::turnOn()
 inline void wheel::turnOff()
 {
 
-	//isForward ? port->setpin(0,pol1): port->setpin(0,pol2);
 	uint8_t data = port->readPort();
-	if(isForward)
-	{
-		//data = data | 1 << pol1;
-		data =  data & ~(1 << pol1); 
-	}
-	else
-	{
-		//data = data | 1 << pol2;
-		data =  data & ~(1 << pol2); 
-	}
+	data =  data & ~(1 << pol1); 
+	data =  data & ~(1 << pol2); 
 	port->setPort(data);
 }

@@ -10,7 +10,7 @@ SRC_DIR = ./src
 _DEPS = wheel.h thread.h engine.h ioport.h types.h epoll.h tcpsocket.h stateMachine.h appFW.h terminal.h
 DEPS = $(patsubst %,$(INC_DIR)/%,$(_DEPS))
 
-_OBJ = thread.o roboApp.o wheel.o ioport.o engine.o  epoll.o tcpsocket.o stateMachine.o appFW.o terminal.o
+_OBJ = thread.o roboApp.o wheel.o ioport.o engine.o  epoll.o tcpsocket.o stateMachine.o appFW.o terminal.o rtimer.o
 OBJ = $(patsubst %,$(ARM_OBJ_DIR)/%,$(_OBJ))
 
 
