@@ -14,6 +14,7 @@ Context::Context()
 {
 	cState = NULL;
 	setCurrentState(new RoboInit(*this));
+	isTrack = false;
 }
 
 //CONTEXT
@@ -23,6 +24,7 @@ void Context::startTracking()
 {	
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
 	cState->handleInit();
+	isTrack = true;
 }
 //CONTEXT
 void Context::setCurrentState(State *stPtr)
@@ -36,13 +38,16 @@ void Context::setCurrentState(State *stPtr)
 int Context::handleBallNone(EMessageT oType,int count)
 {
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
-	if( (NULL != cState) && (oType == DTD_OBJ_M_BALL))
+	if(isTrack)
 	{
-		cState->handleMultipleBall();
-	}
-	if( (NULL != cState) && (oType == DTD_OBJ_NOBALL))
-	{
-		cState->handleBallNotFound();
+		if( (NULL != cState) && (oType == DTD_OBJ_M_BALL))
+		{
+			cState->handleMultipleBall();
+		}
+		if( (NULL != cState) && (oType == DTD_OBJ_NOBALL))
+		{
+			cState->handleBallNotFound();
+		}
 	}
 }
 
@@ -90,14 +95,29 @@ int Context::getError(RCircle &data)
 	}
 	else if(data.x > upperLimit)
 	{
-		return data.x - upperLimit;
+		//return data.x - upperLimit;
+		return data.x - xmax/2;
 	}
-	return data.x - lowerLimit;
+	//return data.x - lowerLimit;
+	return data.x - xmax/2;
 
 }
 
+void Context::setDirectionL(int err)
+{	
+	syslog(LOG_INFO, "State::%s ENTRY %d",__func__,err);
+	Engine * engine = Engine::getInstance();
+	int angle = err * -2;
+	engine->MoveLeft(angle);
+}
 
-
+void Context::setDirectionR(int err)
+{	
+	syslog(LOG_INFO, "State::%s ENTRY",__func__);
+	Engine * engine = Engine::getInstance();
+	int angle = err * 2;
+	engine->MoveRight(angle);
+}
 /////////////////////// STATE ///////////////////////
 //STATE
 State::State(Context &ctxt):context(ctxt)
@@ -285,6 +305,9 @@ int BallOnRight::handleBallNotFound(int count)
 int BallOnRight::handleBallOnRight(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "BallOnRight::%s ENTRY",__func__);
+	//engine_p->MoveRight(70);
+
+	context.setDirectionR(err);
 }
 
 int BallOnRight::handleBallOnLeft(RCircle &rCircle,int err)
@@ -334,6 +357,7 @@ int BallOnLeft::handleBallOnRight(RCircle &rCircle,int err)
 int BallOnLeft::handleBallOnLeft(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "BallOnLeft::%s ENTRY",__func__);
+	context.setDirectionL(err);
 }
 int BallOnLeft::handleBallOnCenter(RCircle &rCircle,int err)
 {

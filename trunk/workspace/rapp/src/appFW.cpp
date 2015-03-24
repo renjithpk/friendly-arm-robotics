@@ -181,6 +181,7 @@ void App::exit()
 {
 
 	//TODO all other cleanup
+	stopRepObjDetet();
     Engine * engine = Engine::getInstance();
 	engine->SetSpeed(0);
 	printf("wait for a moment...\n");

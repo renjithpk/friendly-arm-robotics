@@ -73,7 +73,7 @@ int RoboApp::onNewObject(EMessageT oType,void * data)
 int RoboApp::onKeyPressed(int ch)
 {
 	Engine * engine = Engine::getInstance();
-	syslog(LOG_DEBUG, "%s ENTRY",__func__);
+	syslog(LOG_INFO, "%s ENTRY",__func__);
 		switch((char) ch)
 		{
 			case '8':
@@ -98,6 +98,22 @@ int RoboApp::onKeyPressed(int ch)
 				break;
 			case 'x':
 			    app_gp->exit();
+				break;
+			case 'c':
+				static bool isCalib = false;
+				if(!isCalib)
+				{
+					syslog(LOG_INFO,"start caliberating ");
+					isCalib = true;
+					app_gp->reqRepObjDetet();
+				}
+				else
+				{
+					syslog(LOG_INFO,"stop caliberating ");
+					isCalib = false;
+					app_gp->stopRepObjDetet();
+					
+				}
 				break;
 			case 'r':
 				context.startTracking();
