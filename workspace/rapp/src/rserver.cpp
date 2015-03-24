@@ -158,10 +158,19 @@ class BallDetector:public RTimer
 
 	void onTimerExpired()
 	{
+		static int count = 0;
 		if(detectBall() > 0)
 		{
-			cout<<"."<<flush;
+			cout<<"|"<<flush;
 			rspMsg.header.type = DTD_OBJ_BALL;
+			rspMsg.rCircle =  trCircle;
+			socket_p->send((unsigned char *)&rspMsg,sizeof(MSG_Circle));
+		}
+		else if(count++ > 3) 
+		{
+			count = 3;
+			cout<<"."<<flush;
+			rspMsg.header.type = DTD_OBJ_NOBALL;
 			rspMsg.rCircle =  trCircle;
 			socket_p->send((unsigned char *)&rspMsg,sizeof(MSG_Circle));
 		}

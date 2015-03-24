@@ -20,6 +20,7 @@ class Context
 	Context();
 	RCircle rCircle;
 	State*  cState;
+	bool isTrack;
 	void setCurrentState(State *stPtr);
 	int handleBallDetected(EMessageT oType, RCircle &rCircle);
 	int handleBallNone(EMessageT oType, int count = -1);
@@ -28,6 +29,8 @@ class Context
 	void rotate(char dir);
 	void moveRight();
 	void moveLeft();
+	void setDirectionR(int err);
+	void setDirectionL(int err);
 };
 
 
