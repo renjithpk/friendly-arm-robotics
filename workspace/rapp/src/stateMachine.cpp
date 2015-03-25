@@ -37,7 +37,7 @@ void Context::setCurrentState(State *stPtr)
 //CONTEXT
 int Context::handleBallNone(EMessageT oType,int count)
 {
-	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
+	syslog(LOG_DEBUG, "Context::%s ENTRY",__func__);
 	if(isTrack)
 	{
 		if( (NULL != cState) && (oType == DTD_OBJ_M_BALL))
@@ -103,20 +103,38 @@ int Context::getError(RCircle &data)
 
 }
 
-void Context::setDirectionL(int err)
+void Context::setDirectionL(int err,const RCircle &rCircle)
 {	
 	syslog(LOG_INFO, "State::%s ENTRY %d",__func__,err);
 	Engine * engine = Engine::getInstance();
 	int angle = err * -2;
-	engine->MoveLeft(angle);
+	if(rCircle.r > 130 )
+	{ 
+		syslog(LOG_INFO,"Reached Ball go slow");
+		engine->SetSpeed(20);
+		engine->MoveLeft(200);
+	}
+	else
+	{
+		engine->MoveLeft(angle);
+	}
 }
 
-void Context::setDirectionR(int err)
+void Context::setDirectionR(int err,const RCircle &rCircle)
 {	
 	syslog(LOG_INFO, "State::%s ENTRY",__func__);
 	Engine * engine = Engine::getInstance();
 	int angle = err * 2;
-	engine->MoveRight(angle);
+	if(rCircle.r > 130 )
+	{ 
+		syslog(LOG_INFO,"Reached Ball go slow");
+		engine->SetSpeed(20);
+		engine->MoveRight(200);
+	}
+	else
+	{
+		engine->MoveRight(angle);
+	}
 }
 /////////////////////// STATE ///////////////////////
 //STATE
@@ -173,7 +191,6 @@ int RoboInit::handleInit()
 
 void RoboInit::onTimerExpired()
 {
-	syslog(LOG_INFO, "RoboInit::%s ENTRY, sstate [%d]  ",__func__,(int)sstate);
 	Engine * engine = Engine::getInstance();
 	switch(sstate)
 	{
@@ -192,11 +209,13 @@ void RoboInit::onTimerExpired()
 		break;
 		
 		case EVerify: //2
+		syslog(LOG_INFO, "Timer expired EVerify");
 		engine->SetDirection(true);
 		engine->SetSpeed(0);
 	    break;
 		
 		case EVerifyTB: //3
+		syslog(LOG_INFO, "Timer expired  EVerify TB");
 		handleInit();	
 		break;
 		case EStop: //4
@@ -213,7 +232,7 @@ int RoboInit::handleBallNotFound(int count)
 		//turn back;
 		engine->SetSpeed(20);
 		engine->MoveRight(100);
-		setDelay(300);
+		setDelay(2000);
 		sstate = EVerifyTB;//turning back
 	}
 }
@@ -307,7 +326,7 @@ int BallOnRight::handleBallOnRight(RCircle &rCircle,int err)
 	syslog(LOG_INFO, "BallOnRight::%s ENTRY",__func__);
 	//engine_p->MoveRight(70);
 
-	context.setDirectionR(err);
+	context.setDirectionR(err,rCircle);
 }
 
 int BallOnRight::handleBallOnLeft(RCircle &rCircle,int err)
@@ -357,7 +376,7 @@ int BallOnLeft::handleBallOnRight(RCircle &rCircle,int err)
 int BallOnLeft::handleBallOnLeft(RCircle &rCircle,int err)
 {
 	syslog(LOG_INFO, "BallOnLeft::%s ENTRY",__func__);
-	context.setDirectionL(err);
+	context.setDirectionL(err,rCircle);
 }
 int BallOnLeft::handleBallOnCenter(RCircle &rCircle,int err)
 {
@@ -421,6 +440,10 @@ int BallLocked::handleBallOnCenter(RCircle &rCircle,int err)
 	{ 
 		syslog(LOG_INFO,"Reached Ball");
 		engine->SetSpeed(0);
+	}
+	else
+	{
+		engine->SetSpeed(100);
 	}
 }
 

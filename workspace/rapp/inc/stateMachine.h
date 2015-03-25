@@ -29,8 +29,8 @@ class Context
 	void rotate(char dir);
 	void moveRight();
 	void moveLeft();
-	void setDirectionR(int err);
-	void setDirectionL(int err);
+	void setDirectionR(int err,const RCircle &rCircle);
+	void setDirectionL(int err,const RCircle &rCircle);
 };
 
 
