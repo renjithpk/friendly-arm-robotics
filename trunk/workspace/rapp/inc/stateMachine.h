@@ -90,6 +90,7 @@ class RoboInit: public State,public RTimer
 {
 	enum ESubState
 	{
+		EInit,
 		ERotateL,
 		ERotateH,
 		EVerify,
