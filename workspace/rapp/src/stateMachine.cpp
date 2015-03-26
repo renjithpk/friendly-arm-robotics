@@ -23,8 +23,8 @@ bool movingRight = false;
 void Context::startTracking()
 {	
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
-	cState->handleInit();
 	isTrack = true;
+	cState->handleInit();
 }
 //CONTEXT
 void Context::setCurrentState(State *stPtr)
@@ -57,26 +57,29 @@ int Context::handleBallNone(EMessageT oType,int count)
 int Context::handleBallDetected(EMessageT oType,RCircle & rCircle)
 {
 	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
-	this->rCircle = rCircle;
-	int err = getError(rCircle );
-	syslog(LOG_INFO,"Err: %d",err);
-	if(err >0)
+	if(isTrack)
 	{
-		if(NULL != cState) cState->handleBallOnRight(rCircle,err);
-	}
-	else if(err <0)
-	{
-		if(NULL != cState) cState->handleBallOnLeft(rCircle,err);
-	}
-	else
-	{
-		if(NULL != cState) cState->handleBallOnCenter(rCircle,err);
+		this->rCircle = rCircle;
+		int err = getError(rCircle );
+		syslog(LOG_INFO,"Err: %d",err);
+		if(err >0)
+		{
+			if(NULL != cState) cState->handleBallOnRight(rCircle,err);
+		}
+		else if(err <0)
+		{
+			if(NULL != cState) cState->handleBallOnLeft(rCircle,err);
+		}
+		else
+		{
+			if(NULL != cState) cState->handleBallOnCenter(rCircle,err);
+		}
 	}
 }
 //CONTEXT
 int Context::getError(RCircle &data)
 {
-	syslog(LOG_INFO, "Context::%s ENTRY",__func__);
+	syslog(LOG_INFO, "Context::%s ENTRY x:%d y:%d r:%d",__func__,data.x,data.y,data.r);
 	/*
 	center range x
 	*/
@@ -174,6 +177,7 @@ RoboInit::RoboInit(Context &ctxt):State(ctxt),isTurnedBack(false)
 {
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
     isRequestSendToconfirm = false;
+	sstate = EInit;
 }
 RoboInit::~RoboInit()
 {
@@ -227,7 +231,14 @@ int RoboInit::handleBallNotFound(int count)
 {
 	syslog(LOG_INFO, "RoboInit::%s ENTRY",__func__);
 	Engine * engine = Engine::getInstance();
-	if(sstate == EVerify)
+	if(sstate == EInit)
+	{
+		syslog(LOG_INFO, "RoboInit::%s state EInit",__func__);
+		app_gp->reqRepObjDetet();
+		sstate = ERotateH;
+		setDelay(1);
+	}
+	else if(sstate == EVerify)
 	{	
 		//turn back;
 		engine->SetSpeed(20);
@@ -243,6 +254,7 @@ bool RoboInit::confirmObject()
 	Engine * engine = Engine::getInstance();
 	switch(sstate)
 	{
+		case EInit:
 		case ERotateL:
 		case ERotateH:
 			{
@@ -417,6 +429,7 @@ int BallLocked::handleBallNotFound(int count)
 	syslog(LOG_INFO, "BallLocked::%s ENTRY",__func__);
 	Engine *engine = Engine::getInstance();
 	engine->SetSpeed(0);
+	context.setCurrentState(new RoboInit(context));
 }
 
 int BallLocked::handleBallOnRight(RCircle &rCircle,int err)

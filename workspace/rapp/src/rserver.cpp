@@ -270,19 +270,12 @@ public:
 			case RQ_REP_OBJ_DETECT:
 				{	
 					cout<<"Request for repeated face detection"<<endl;
-					/*if(NULL == bd_p)
-					{
-						bd_p= new BallDetector;
-					}*/
-					/*if(NULL != bd_p)*/ 
 					bd.startRepeatedDetect(socket);
 					break;
 				}
 
 			case CNCL_REP_OBJ_DETECT:
 				{	
-					//delete bd_p;
-					//bd_p = NULL;
 					bd.stopRepeatDetect();
 					break;
 				}
