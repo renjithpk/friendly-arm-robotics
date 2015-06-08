@@ -17,9 +17,9 @@
 class wheel :  public Thread
 {
 
-	uint16_t	onTime; 	//unit millisecond
-	uint16_t	offTime;		//millisecond
-	uint16_t	timePeriod;
+	unsigned int	onTime; 	//unit millisecond
+	unsigned int	offTime;		//millisecond
+	unsigned int	timePeriod;
 	uint8_t 	dutyCycle; 	// in %
 	bool		isForward; // true forward / false reverse
 	I2CPort*	port;
@@ -29,7 +29,7 @@ class wheel :  public Thread
 	virtual void Execute(void*);
 public:
 
-	wheel(char aType, uint16_t aPeriod = 4553);
+	wheel(char aType, unsigned int aPeriod = 100000);
 	void setSpeed(uint8_t speed);
 	void setDirection(bool aIsforward);
 	void turnOn();
