@@ -8,6 +8,7 @@
 #include "roboApp.h"
 #include "types.h"
 #include "iostream"
+using namespace std;
 App * app_gp = NULL;
 void init_log()
 {
@@ -20,18 +21,17 @@ int main(int argc,char *argv[])
 {
 	init_log();
 	syslog(LOG_NOTICE, "Roboapp started!!%s","test");
-	std::cout<<"Press 'x' for exit"<<endl;	
-	std::cout<<"up-8 or a, down-2 or z,left-4, right-6, stop-5 "<<endl;	
 	RoboApp  myapp;
 	
 	App app(argc,argv); app_gp = &app;
-
+	cout<<"Press any key to continue.."<<endl;
 	app.Register(&myapp);
 	return 0;
 }
 
 RoboApp::RoboApp()
 {
+	mode =0;
 //	syslog(LOG_DEBUG, "%s ENTRY",__func__);
 }
 /*
@@ -67,65 +67,158 @@ int RoboApp::onNewObject(EMessageT oType,void * data)
 	}
 }
 
-
-
-
-int RoboApp::onKeyPressed(int ch)
+int RoboApp::menu_2(int key)
+{
+	switch (key)
+	{
+		default:
+				context.startTracking();
+		break;	
+		case 'x':
+			mode = 0;
+			menu_0('p');	
+		break;
+	}
+	
+}
+int RoboApp::menu_3(int key)
 {
 	Engine * engine = Engine::getInstance();
 	syslog(LOG_INFO, "%s ENTRY",__func__);
-		switch((char) ch)
-		{
-			case '8':
-			case 'a':
-			case 'A':
-				engine->SpeedUp();
-				break;
-			case '2':
-			case 'z':
-			case 'Z':
-				engine->SpeedDown();
-				break;
-			case '4':
-				engine->MoveLeft(70);
-				break;
-			case '6':
-				engine->MoveRight(70);
-				break;
-
-			case '5':
-				engine->SetSpeed(0);
-				break;
-			case 'x':
-			    app_gp->exit();
-				break;
-			case 'c':
-				static bool isCalib = false;
-				if(!isCalib)
-				{
-					syslog(LOG_INFO,"start caliberating ");
-					isCalib = true;
-					app_gp->reqRepObjDetet();
-				}
-				else
-				{
-					syslog(LOG_INFO,"stop caliberating ");
-					isCalib = false;
-					app_gp->stopRepObjDetet();
-					
-				}
-				break;
-			case 'r':
-				context.startTracking();
-
-
+	switch((char) key)
+	{
+		default:
+			cout<<" servo controll 4  6 8 2  "<<endl;
 			break;
-			default:
-				return 0;
-				engine->SetSpeed(0);
+		case '4':
+			engine->SpeedUp();
+			break;
+		case '6':
+			engine->SpeedDown();
+			break;
+		case '8':
+			engine->MoveLeft(70);
+			break;
+		case '2':
+			engine->MoveRight(70);
+			break;
+		case 'x':
+			mode = 0;
+			menu_0('p');	
+		break;
+	}
+	
+}
+int RoboApp::menu_0(int key)
+{
+	
+	switch (key)
+	{
+		default:
+		cout<<"Press 't' -> track ball, 'm' manual ctrl , 's' servo ctrl, 'c' caliberate, 'x' exit"<<endl;
+		break;
+		case 't':
+		mode = 2;
+		menu_2('p');
+		break;
+		case 'm':
+		mode = 1;
+		menu_1('p');
+		break;
+		case 's':
+		mode = 3;
+		menu_3('p');
+		break;
+		case 'c':
+		mode = 4;
+		menu_4('p');
+		break;
+		case 'x':
+		app_gp->exit();
+		break;
+	}
+	//std::cout<<"Press 'x' for exit"<<endl;	
 
+}
 
-		}
+int RoboApp::menu_4(int key)
+{
+	switch(key)
+	{
+		default:	
+			cout<<"Press 'c' -> caliberate, 's'  stop"<<endl;
+			break;
+		case 'c':
+			syslog(LOG_INFO,"caliberate ");
+			app_gp->reqRepObjDetet();
+			break;
+		case 's':
+			syslog(LOG_INFO,"stop caliberating ");
+			app_gp->stopRepObjDetet();
+			break;
+		case 'x':
+			mode = 0;
+			menu_0('p');	
+		break;
+	}
+
+}
+//0 -- main menu
+int RoboApp::onKeyPressed(int ch)
+{
+	switch (mode)
+	{
+		case 0:
+		menu_0(ch);
+		//onKeyPressed(ch);
+		break;
+		case 1:
+		menu_1(ch);
+		break;
+		case 2:
+		menu_2(ch);
+		break;
+		case 3:
+		menu_3(ch);
+		break;
+		case 4:
+		menu_4(ch);
+		break;
+	}
+}
+int RoboApp::menu_1(int key)
+{
+	Engine * engine = Engine::getInstance();
+	syslog(LOG_INFO, "%s ENTRY",__func__);
+	switch((char) key)
+	{
+		default:
+			cout<<"4 5 6 8 2 a A z Z "<<endl;
+			break;
+		case '8':
+		case 'a':
+		case 'A':
+			engine->SpeedUp();
+			break;
+		case '2':
+		case 'z':
+		case 'Z':
+			engine->SpeedDown();
+			break;
+		case '4':
+			engine->MoveLeft(70);
+			break;
+		case '6':
+			engine->MoveRight(70);
+			break;
+		case '5':
+			engine->SetSpeed(0);
+			break;
+		case 'x':
+			mode = 0;
+			menu_0('p');	
+		break;
+	}
 }
 
 

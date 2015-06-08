@@ -6,7 +6,7 @@
  */
 
 #include "wheel.h"
-wheel::wheel(char aType, uint16_t aPeriod)
+wheel::wheel(char aType, unsigned int aPeriod)
 {
 	syslog(LOG_INFO,"wheelConstructor");
 	timePeriod 	= aPeriod; //1 second;
@@ -16,13 +16,13 @@ wheel::wheel(char aType, uint16_t aPeriod)
 	port 		= I2CPort::Create();
 	if('L' == aType)
 	{
-		pol1  = 0;
-		pol2  = 1;
+		pol1  = 1;
+		pol2  = 0;
 	}
 	else if('R' == aType)
 	{
-		pol1  = 2;
-		pol2  = 3;
+		pol1  = 3;
+		pol2  = 2;
 	}
 	type = aType;
 }
@@ -46,7 +46,7 @@ void wheel::setSpeed(uint8_t aSpeed)
 	onTime = (timePeriod*aSpeed)/100;
 	offTime = timePeriod - onTime;
 	
-	//syslog(LOG_INFO,"set speed %d %c ON %d OFF %d",aSpeed,type,onTime,offTime);
+	syslog(LOG_INFO,"set speed %d %c ON %d OFF %d",aSpeed,type,onTime,offTime);
 }
 void wheel::setDirection(bool aIsForward)
 {

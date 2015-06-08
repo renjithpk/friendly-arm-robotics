@@ -18,13 +18,19 @@ class RoboApp: public AppIf
 	//Engine* engine;
 	Context context;
 	int 	speed;
+	int mode;
 //	bool	isBlocked;
 public:
 	RoboApp();
 	~RoboApp();
 	int init(int argc,char * argv[]);
 	int onNewObject(EMessageT oType,void * data);
-	int onKeyPressed(int ch); 
+	int onKeyPressed(int ch);
+	int menu_0(int ch);
+	int menu_1(int ch);
+	int menu_2(int ch);
+	int menu_3(int ch);
+	int menu_4(int ch);
 };
 
 #endif /* ROBOAPP_H_ */
